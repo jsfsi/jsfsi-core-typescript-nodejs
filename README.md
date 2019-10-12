@@ -49,5 +49,5 @@ npm install --save-dev <package_name>
 ## Include as a dependency in your project
 
 ```sh
-npm install --save ssh://git@github.com:joaosousafranco/jsfsi-core-typescript-cross-platform.git
+npm install --save ssh://git@github.com:joaosousafranco/jsfsi-core-typescript-nodejs.git
 ```
