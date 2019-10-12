@@ -28,8 +28,6 @@
   },
   "homepage": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs#readme",
   "devDependencies": {
-    "@types/cors": "^2.8.6",
-    "@types/swagger-ui-express": "^3.0.1",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "eslint": "^6.5.1",
@@ -40,6 +38,8 @@
   },
   "dependencies": {
     "@jsfsi-core/typescript-cross-platform": "git+ssh://git@github.com/joaosousafranco/jsfsi-core-typescript-cross-platform.git",
+    "@types/cors": "^2.8.6",
+    "@types/swagger-ui-express": "^3.0.1",
     "cors": "^2.8.5",
     "knex": "^0.19.5",
     "log4js": "^5.2.2",
