@@ -56,7 +56,7 @@ export class RestServerBuilder {
     private _cookieParserOptions: CookieParserOptions
 
     public get port() {
-        return this._port
+        return this._port || 8080
     }
 
     public get corsDomains() {
