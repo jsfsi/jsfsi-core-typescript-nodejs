@@ -1,0 +1,44 @@
+{
+    "files.exclude": {
+        "packages/**/index.js": true,
+        "packages/**/index.js.map": true,
+        "packages/**/tests/**/*.xml": true,
+        "node_modules": true,
+        "packages/**/src/*.js": true,
+        "packages/**/src/*.js.map": true,
+        "packages/**/src/**/*.js": true,
+        "packages/**/src/**/*.js.map": true,
+        "packages/**/tests/**/*.js": true,
+        "packages/**/tests/**/*.js.map": true,
+        "packages/**/dist": true,
+        "packages/**/node_modules": true,
+        "dist": true
+    },
+    "typescript.preferences.quoteStyle": "single",
+    "eslint.autoFixOnSave": true,
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        {
+            "language": "typescript",
+            "autoFix": true
+        },
+        {
+            "language": "typescriptreact",
+            "autoFix": true
+        }
+    ],
+    "editor.formatOnSave": true,
+    "[javascript]": {
+        "editor.formatOnSave": false,
+    },
+    "[javascriptreact]": {
+        "editor.formatOnSave": false,
+    },
+    "[typescript]": {
+        "editor.formatOnSave": false,
+    },
+    "[typescriptreact]": {
+        "editor.formatOnSave": false,
+    },
+}

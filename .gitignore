@@ -1,0 +1,12 @@
+**/coverage
+**/node_modules
+**/dist
+lerna-debug.log
+yarn-error.log
+npm-debug.log
+
+# intellij files
+**/*.iml
+**/.idea
+
+.DS_Store
