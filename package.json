@@ -44,6 +44,7 @@
     "knex": "^0.19.5",
     "log4js": "^5.2.2",
     "swagger-ui-express": "^4.1.2",
+    "typescript-ioc": "^1.2.5",
     "typescript-rest": "^2.2.2"
   }
 }

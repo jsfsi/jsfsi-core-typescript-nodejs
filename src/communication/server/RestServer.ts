@@ -173,23 +173,25 @@ export class RestServer {
     }
 
     private setupSwagger() {
-        const opts = this.builder.swaggerOptions
-        const favicon = opts.faviconFilePath
-        const logo = opts.logoFilePath
-        const pageTitle = opts.pageTitle
-        const swaggerConfig = JSON.parse(fs.readFileSync(opts.swaggerFilePath, 'utf8'))
-        const customCss = `.swagger-ui .topbar { background-color: ${opts.headerColor} }
-                           .swagger-ui .topbar-wrapper img { content:url(\'${logo}\') }`
+        if (this.builder.swaggerOptions) {
+            const opts = this.builder.swaggerOptions
+            const favicon = opts.faviconFilePath
+            const logo = opts.logoFilePath
+            const pageTitle = opts.pageTitle
+            const swaggerConfig = JSON.parse(fs.readFileSync(opts.swaggerFilePath, 'utf8'))
+            const customCss = `.swagger-ui .topbar { background-color: ${opts.headerColor} }
+                            .swagger-ui .topbar-wrapper img { content:url(\'${logo}\') }`
 
-        if (opts.version) {
-            swaggerConfig.info.version = opts.version
+            if (opts.version) {
+                swaggerConfig.info.version = opts.version
+            }
+
+            this._application.use(
+                '/docs',
+                swaggerUi.serve,
+                swaggerUi.setup(swaggerConfig, null, null, customCss, favicon, null, pageTitle),
+            )
         }
-
-        this._application.use(
-            '/docs',
-            swaggerUi.serve,
-            swaggerUi.setup(swaggerConfig, null, null, customCss, favicon, null, pageTitle),
-        )
     }
 
     private setupControllers() {
