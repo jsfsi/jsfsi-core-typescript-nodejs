@@ -156,6 +156,7 @@ export class HttpServer {
 
     constructor(builder: HttpServerBuilder) {
         this.builder = builder
+        this._application = express()
     }
 
     public get application() {
@@ -225,7 +226,6 @@ export class HttpServer {
     }
 
     public async start(): Promise<void> {
-        this._application = express()
         Server.useIoC()
         this.setupCookieParser()
         this.setupCors()
