@@ -33,6 +33,8 @@ export interface SwaggerOptions {
     logoFilePath?: string
     /** Changes the favicon. Default is the focus logo */
     faviconFilePath?: string
+    /** Set the endpoint path for swagger page */
+    docsEndpoint?: string
 }
 
 interface CookieParserOptions {
@@ -189,7 +191,7 @@ export class HttpServer {
             }
 
             this._application.use(
-                swaggerConfig?.docsEndpoint || '/docs',
+                opts.docsEndpoint || '/docs',
                 swaggerUi.serve,
                 swaggerUi.setup(swaggerConfig, null, null, customCss, favicon, null, pageTitle),
             )
