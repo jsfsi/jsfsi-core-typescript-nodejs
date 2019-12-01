@@ -118,6 +118,7 @@ export class HttpServerBuilder {
                 ? this.encodeImgToBase64(opts.faviconFilePath)
                 : HttpServerBuilder.defaultFavicon,
             logoFilePath: opts.logoFilePath ? this.encodeImgToBase64(opts.logoFilePath) : HttpServerBuilder.defaultLogo,
+            docsEndpoint: opts.docsEndpoint,
         }
 
         return this
