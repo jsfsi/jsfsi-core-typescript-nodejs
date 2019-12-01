@@ -43,7 +43,7 @@ export class HttpServerBuilder {
     private static readonly defaultLogo = Assets.jsfsiLogo
     private static readonly defaultFavicon = Assets.jsfsiFavicon
     private static readonly defaultTitle = 'JSFSI - Docs'
-    private static readonly defaultHeaderColor = '#00649e'
+    private static readonly defaultHeaderColor = '#FFFFFF'
     private static readonly defaultSwaggerFile = './dist/swagger.json'
     private static readonly defaultPort = 8080
 
