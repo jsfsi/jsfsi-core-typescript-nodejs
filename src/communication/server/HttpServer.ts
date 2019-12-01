@@ -189,7 +189,7 @@ export class HttpServer {
             }
 
             this._application.use(
-                '/docs',
+                swaggerConfig?.docsEndpoint || '/docs',
                 swaggerUi.serve,
                 swaggerUi.setup(swaggerConfig, null, null, customCss, favicon, null, pageTitle),
             )
