@@ -190,8 +190,11 @@ export class HttpServer {
                 swaggerConfig.info.version = opts.version
             }
 
+            const docsEndpoint = opts.docsEndpoint || '/docs'
+            Logger.info(`Swagger available in path: ${docsEndpoint}`)
+
             this._application.use(
-                opts.docsEndpoint || '/docs',
+                docsEndpoint,
                 swaggerUi.serve,
                 swaggerUi.setup(swaggerConfig, null, null, customCss, favicon, null, pageTitle),
             )
