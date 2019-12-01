@@ -1,5 +1,5 @@
 import { Errors } from 'typescript-rest'
-import { RestRequest, RestResponse } from '../RestServer'
+import { HttpRequest, HttpResponse } from '../HttpServer'
 import { NextFunction } from 'express-serve-static-core'
 import { Logger } from '../../../Logger'
 import {
@@ -13,8 +13,9 @@ import {
 
 export const errorHandler = (
     error: Error & Errors.HttpError,
-    _: RestRequest,
-    response: RestResponse,
+    _: HttpRequest,
+    response: HttpResponse,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     __: NextFunction,
 ) => {
     if (error) {

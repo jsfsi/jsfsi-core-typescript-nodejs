@@ -44,9 +44,11 @@ export class Database implements Disposable {
 
     public async count(tableName: string) {
         return parseInt(
-            (await this.query()
-                .count({ count: '*' })
-                .from(tableName))[0].count,
+            (
+                await this.query()
+                    .count({ count: '*' })
+                    .from(tableName)
+            )[0].count,
             0,
         )
     }

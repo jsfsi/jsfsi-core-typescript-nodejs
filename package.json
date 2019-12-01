@@ -2,48 +2,46 @@
   "name": "@jsfsi-core/typescript-nodejs",
   "version": "0.0.0",
   "description": "Typescript libraries for nodejs to support jsfsi developments",
-  "main": "./dist",
-  "typings": "./dist/index.d.ts",
-  "scripts": {
-    "clean": "npm run clean:build; rm -rf node_modules",
-    "clean:build": "rm -rf dist",
-    "setup": "npm run clean && npm install",
-    "lint": "eslint . --quiet --fix --ext .ts,.tsx",
-    "build": "npm run clean:build && npm run lint && tsc",
-    "postinstall": "npm run clean:build && tsc"
+  "keywords": [
+    "core",
+    "jsfsi",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs#readme",
+  "bugs": {
+    "url": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs.git"
   },
-  "keywords": [
-    "jsfsi",
-    "core",
-    "nodejs"
-  ],
-  "author": "JSFSI <joao.franco@jsfsi.com>",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs/issues"
-  },
-  "homepage": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs#readme",
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.3.3",
-    "@typescript-eslint/parser": "^2.3.3",
-    "eslint": "^6.5.1",
-    "eslint-config-prettier": "^6.4.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "prettier": "^1.18.2",
-    "typescript": "3.6.4"
+  "author": "JSFSI <joao.franco@jsfsi.com>",
+  "main": "./dist",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean:build && npm run lint && tsc",
+    "clean": "npm run clean:build; rm -rf node_modules",
+    "clean:build": "rm -rf dist",
+    "postinstall": "npm run clean:build && tsc",
+    "lint": "eslint . --quiet --fix --ext .ts,.tsx",
+    "setup": "npm run clean && npm install"
   },
   "dependencies": {
     "@jsfsi-core/typescript-cross-platform": "git+ssh://git@github.com/joaosousafranco/jsfsi-core-typescript-cross-platform.git",
     "@types/cors": "^2.8.6",
     "@types/swagger-ui-express": "^3.0.1",
+    "@typescript-eslint/eslint-plugin": "2.9.0",
+    "@typescript-eslint/parser": "2.9.0",
     "cors": "^2.8.5",
+    "eslint": "6.7.1",
+    "eslint-config-prettier": "6.7.0",
+    "eslint-plugin-prettier": "3.1.1",
     "knex": "^0.19.5",
     "log4js": "^5.2.2",
+    "prettier": "1.19.1",
     "swagger-ui-express": "^4.1.2",
+    "typescript": "3.7.2",
     "typescript-ioc": "^1.2.5",
     "typescript-rest": "^2.2.2"
   }
