@@ -47,8 +47,8 @@ type ContextFunction<FunctionParams = any, ProducedContext = object> = (
 ) => ValueOrPromise<Context<ProducedContext>>
 export interface GraphqlOptions extends BuildSchemaOptions {
     path: string
-    tracing: boolean
-    playground: boolean
+    tracing?: boolean
+    playground?: boolean
     context?: Context | ContextFunction
 }
 
