@@ -3,12 +3,14 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import fs from 'fs'
-import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 import { Errors, Server } from 'typescript-rest'
 import { Assets } from '@jsfsi-core/typescript-cross-platform'
 import { Logger } from '../../Logger'
 import { errorHandler as defaultErrorHandler } from './errors'
+import { ApolloServerExpressConfig, ApolloServer } from 'apollo-server-express'
+import { buildSchema, BuildSchemaOptions } from 'type-graphql'
+import { encodeImgToBase64 } from '../../Images'
 
 export type HttpRequest = Request
 export type HttpResponse = Response
@@ -37,6 +39,19 @@ export interface SwaggerOptions {
     docsEndpoint?: string
 }
 
+type ValueOrPromise<T> = T | Promise<T>
+type Context<T = object> = T
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ContextFunction<FunctionParams = any, ProducedContext = object> = (
+    context: FunctionParams,
+) => ValueOrPromise<Context<ProducedContext>>
+export interface GraphqlOptions extends BuildSchemaOptions {
+    path: string
+    tracing: boolean
+    playground: boolean
+    context?: Context | ContextFunction
+}
+
 interface CookieParserOptions {
     secret?: string
 }
@@ -57,6 +72,7 @@ export class HttpServerBuilder {
     private _errorHandler: ErrorHandler
     private _jsonOptions: OptionsJson
     private _cookieParserOptions: CookieParserOptions
+    private _graphqlOptions: GraphqlOptions
 
     public get port() {
         return this._port || 8080
@@ -86,10 +102,8 @@ export class HttpServerBuilder {
         return this._cookieParserOptions
     }
 
-    private encodeImgToBase64(imagePath: string) {
-        const extension = path.extname(imagePath).substr(1)
-        const content = fs.readFileSync(imagePath, 'base64')
-        return `data:image/${extension};base64,${content}`
+    public get graphqlOptions() {
+        return this._graphqlOptions
     }
 
     public withPort(port: number) {
@@ -115,9 +129,9 @@ export class HttpServerBuilder {
             pageTitle: opts.pageTitle || HttpServerBuilder.defaultTitle,
             headerColor: opts.headerColor || HttpServerBuilder.defaultHeaderColor,
             faviconFilePath: opts.faviconFilePath
-                ? this.encodeImgToBase64(opts.faviconFilePath)
+                ? encodeImgToBase64(opts.faviconFilePath)
                 : HttpServerBuilder.defaultFavicon,
-            logoFilePath: opts.logoFilePath ? this.encodeImgToBase64(opts.logoFilePath) : HttpServerBuilder.defaultLogo,
+            logoFilePath: opts.logoFilePath ? encodeImgToBase64(opts.logoFilePath) : HttpServerBuilder.defaultLogo,
             docsEndpoint: opts.docsEndpoint,
         }
 
@@ -142,6 +156,11 @@ export class HttpServerBuilder {
 
     public withCookieParser(options: CookieParserOptions) {
         this._cookieParserOptions = options
+        return this
+    }
+
+    public withGraphql(options: GraphqlOptions) {
+        this._graphqlOptions = options
         return this
     }
 
@@ -225,6 +244,26 @@ export class HttpServer {
         }
     }
 
+    private async setupGraphql() {
+        if (this.builder.graphqlOptions) {
+            const { path, tracing, playground, context } = this.builder.graphqlOptions
+
+            const schema = await buildSchema(this.builder.graphqlOptions)
+
+            const graphqlConfig: ApolloServerExpressConfig = {
+                schema,
+                tracing,
+                playground,
+                context,
+            }
+
+            const graphqlServer = new ApolloServer(graphqlConfig)
+
+            Logger.info('Graphql playground available in path: /graphql')
+            graphqlServer.applyMiddleware({ app: this._application, path })
+        }
+    }
+
     public async start(): Promise<void> {
         Server.useIoC()
         this.setupCookieParser()
@@ -233,6 +272,7 @@ export class HttpServer {
         this.setupSwagger()
         this.setupControllers()
         this.setupErrorHandler()
+        this.setupGraphql()
 
         return new Promise<void>(resolve => {
             this._application.listen(this.builder.port, () => {
