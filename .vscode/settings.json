@@ -15,18 +15,11 @@
         "dist": true
     },
     "typescript.preferences.quoteStyle": "single",
-    "eslint.autoFixOnSave": true,
     "eslint.validate": [
         "javascript",
         "javascriptreact",
-        {
-            "language": "typescript",
-            "autoFix": true
-        },
-        {
-            "language": "typescriptreact",
-            "autoFix": true
-        }
+        "typescript",
+        "typescriptreact",
     ],
     "editor.formatOnSave": true,
     "[javascript]": {
@@ -40,5 +33,8 @@
     },
     "[typescriptreact]": {
         "editor.formatOnSave": false,
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
     },
 }

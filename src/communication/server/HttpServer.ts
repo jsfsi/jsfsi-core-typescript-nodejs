@@ -48,6 +48,7 @@ type ContextFunction<FunctionParams = any, ProducedContext = object> = (
 export interface GraphqlOptions extends BuildSchemaOptions {
     path: string
     tracing?: boolean
+    introspection?: boolean
     playground?: boolean
     context?: Context | ContextFunction
 }
@@ -246,7 +247,7 @@ export class HttpServer {
 
     private async setupGraphql() {
         if (this.builder.graphqlOptions) {
-            const { path, tracing, playground, context } = this.builder.graphqlOptions
+            const { path, tracing, playground, context, introspection } = this.builder.graphqlOptions
 
             const schema = await buildSchema(this.builder.graphqlOptions)
 
@@ -255,6 +256,7 @@ export class HttpServer {
                 tracing,
                 playground,
                 context,
+                introspection,
             }
 
             const graphqlServer = new ApolloServer(graphqlConfig)
