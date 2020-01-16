@@ -132,7 +132,9 @@ export class HttpServerBuilder {
             faviconFilePath: opts.faviconFilePath
                 ? encodeImgToBase64(opts.faviconFilePath)
                 : HttpServerBuilder.defaultFavicon,
-            logoFilePath: opts.logoFilePath ? encodeImgToBase64(opts.logoFilePath) : HttpServerBuilder.defaultLogo,
+            logoFilePath: opts.logoFilePath
+                ? encodeImgToBase64(opts.logoFilePath)
+                : HttpServerBuilder.defaultLogo,
             docsEndpoint: opts.docsEndpoint,
         }
 
@@ -190,7 +192,9 @@ export class HttpServer {
 
         this._application.use(
             cors({
-                origin: (this.builder.corsDomains || '').split(',').map(regExp => new RegExp(regExp)),
+                origin: (this.builder.corsDomains || '')
+                    .split(',')
+                    .map(regExp => new RegExp(regExp)),
                 maxAge: 5,
                 exposedHeaders: ['X-Api-Version', 'X-Request-Id', 'X-Response-Time'],
                 credentials: true,
@@ -204,7 +208,9 @@ export class HttpServer {
             const favicon = opts.faviconFilePath
             const logo = opts.logoFilePath
             const pageTitle = opts.pageTitle
-            const swaggerConfig = JSON.parse(fs.readFileSync(opts.swaggerFilePath, 'utf8'))
+            const swaggerConfig = JSON.parse(
+                fs.readFileSync(opts.swaggerFilePath, 'utf8'),
+            )
             const customCss = `.swagger-ui .topbar { background-color: ${opts.headerColor} }
                             .swagger-ui .topbar-wrapper img { content:url(\'${logo}\') }`
 
@@ -218,7 +224,15 @@ export class HttpServer {
             this._application.use(
                 docsEndpoint,
                 swaggerUi.serve,
-                swaggerUi.setup(swaggerConfig, null, null, customCss, favicon, null, pageTitle),
+                swaggerUi.setup(
+                    swaggerConfig,
+                    null,
+                    null,
+                    customCss,
+                    favicon,
+                    null,
+                    pageTitle,
+                ),
             )
         }
     }
@@ -247,7 +261,13 @@ export class HttpServer {
 
     private async setupGraphql() {
         if (this.builder.graphqlOptions) {
-            const { path, tracing, playground, context, introspection } = this.builder.graphqlOptions
+            const {
+                path,
+                tracing,
+                playground,
+                context,
+                introspection,
+            } = this.builder.graphqlOptions
 
             const schema = await buildSchema(this.builder.graphqlOptions)
 

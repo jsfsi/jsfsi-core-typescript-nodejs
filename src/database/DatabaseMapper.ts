@@ -18,7 +18,9 @@ export class DatabaseMapper<T> {
 
         properties.forEach(property => {
             if (typeof property === 'string') {
-                ;(mappedInstance as any)[property] = this._databaseObject[property.toString().toLowerCase()]
+                ;(mappedInstance as any)[property] = this._databaseObject[
+                    property.toString().toLowerCase()
+                ]
             }
 
             if (typeof property === 'object') {

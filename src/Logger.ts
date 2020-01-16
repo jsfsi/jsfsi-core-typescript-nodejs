@@ -22,13 +22,16 @@ export class Logger {
                 appenders: this.defaultLoggerParameters.appenders,
                 categories: {
                     default: {
-                        appenders: this.defaultLoggerParameters.categories.default.appenders,
+                        appenders: this.defaultLoggerParameters.categories.default
+                            .appenders,
                         level: param,
                     },
                 },
             })
         } else {
-            log4js.configure((param as log4js.Configuration) || this.defaultLoggerParameters)
+            log4js.configure(
+                (param as log4js.Configuration) || this.defaultLoggerParameters,
+            )
         }
 
         this.logger = log4js.getLogger()

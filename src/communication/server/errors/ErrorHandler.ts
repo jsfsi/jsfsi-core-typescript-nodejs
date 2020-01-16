@@ -25,13 +25,17 @@ export const errorHandler = (
             (error instanceof UnauthorizedError && StatusCode.UNAUTHORIZED) ||
             (error instanceof ForbiddenError && StatusCode.FORBIDDEN) ||
             (error instanceof NotFoundError && StatusCode.NOT_FOUND) ||
-            (error instanceof AuthenticationTimeoutError && StatusCode.AUTHENTICATION_TIMEOUT) ||
+            (error instanceof AuthenticationTimeoutError &&
+                StatusCode.AUTHENTICATION_TIMEOUT) ||
             StatusCode.INTERNAL_SERVER_ERROR
 
         const location = (error as UnauthorizedError).location
 
         // Remove errors trace from the message that will be send to client
-        const message = statusCode === StatusCode.INTERNAL_SERVER_ERROR ? 'Internal Server Error' : error.message
+        const message =
+            statusCode === StatusCode.INTERNAL_SERVER_ERROR
+                ? 'Internal Server Error'
+                : error.message
 
         if (statusCode >= 500) {
             Logger.error(error)
