@@ -3,18 +3,20 @@ import { Inject } from 'typescript-ioc'
 import { RedisClient } from 'redis'
 
 export abstract class RedisConfiguration {
-    host: string
-    port: number
-    db?: string
-    password?: string
-    connect_timeout?: number
+    redis: {
+        host: string
+        port: number
+        db?: string
+        password?: string
+        connect_timeout?: number
+    }
 }
 
 export class RedisStorage implements Storage<string, string> {
     private connection: RedisClient
 
     constructor(@Inject configuration: RedisConfiguration) {
-        this.connection = new RedisClient(configuration)
+        this.connection = new RedisClient(configuration.redis)
     }
 
     async set(key: string, value: string) {
