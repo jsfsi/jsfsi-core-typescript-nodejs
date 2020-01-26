@@ -23,7 +23,7 @@ export abstract class LoginServiceConfiguration {
     }
 }
 
-export class LoginService {
+export class LoginService<U extends object> {
     @Inject
     private tokenStorage: Storage<string, string>
 
@@ -31,7 +31,7 @@ export class LoginService {
     private configuration: LoginServiceConfiguration
 
     @Inject
-    private userRepository: UserRepository<object>
+    private userRepository: UserRepository<U>
 
     private privateKey: Buffer
     private google: Google
@@ -51,7 +51,7 @@ export class LoginService {
             const expirationDate = (new Date().getTime() + (jwt.duration || 0)) / 1000
             const privateKey = this.privateKey
 
-            const token = await TokenGenerator.generateJWT<object>(user, {
+            const token = await TokenGenerator.generateJWT<U>(user, {
                 expirationDate,
                 privateKey,
                 algorithm: jwt.algorithm,
