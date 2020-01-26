@@ -1,9 +1,9 @@
 import { ObjectType, Field } from 'type-graphql'
 
 @ObjectType()
-export class Login<U> {
+export class Login {
     @Field()
-    user: U
+    user: object
 
     @Field()
     token: string

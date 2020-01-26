@@ -13,18 +13,18 @@ export abstract class LoginResolverConfiguration {
 }
 
 @Resolver()
-export class LoginResolver<U extends object> {
+export class LoginResolver {
     @Inject
     private configuration: LoginResolverConfiguration
 
     @Inject
-    private loginService: LoginService<U>
+    private loginService: LoginService
 
     @Mutation(_ => Login)
     async loginWithGoogle(
         @Arg('accessToken') accessToken: string,
         @Ctx() context: Context,
-    ): Promise<Login<U>> {
+    ): Promise<Login> {
         try {
             const loginInfo = await this.loginService.loginWithGoogle(accessToken)
 
