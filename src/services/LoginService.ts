@@ -4,6 +4,8 @@ import { UserRepository } from '../repositories/UserRepository'
 import { TokenGenerator } from '../TokenGenerator'
 import { Logger } from '../Logger'
 import { Google } from '../Google'
+import { Storage } from 'src/storage'
+import { md5 } from 'src/Hash'
 
 export abstract class LoginServiceConfiguration {
     google: {
@@ -14,10 +16,17 @@ export abstract class LoginServiceConfiguration {
         algorithm: string
         privateKey: string
         duration: number
+
+        refreshToken: {
+            duration: number
+        }
     }
 }
 
-export class LoginService<U> {
+export class LoginService<U extends object> {
+    @Inject
+    private tokenStorage: Storage<string, string>
+
     @Inject
     private configuration: LoginServiceConfiguration
 
@@ -34,23 +43,31 @@ export class LoginService<U> {
 
     async loginWithGoogle(accessToken: string) {
         try {
+            const { jwt } = this.configuration
+
             const googleUser = await this.google.userInfo(accessToken)
 
             const user = await this.userRepository.getUserByGoogleUser(googleUser)
-            const expirationDate =
-                (new Date().getTime() + (this.configuration.jwt.duration || 0)) / 1000
+            const expirationDate = (new Date().getTime() + (jwt.duration || 0)) / 1000
             const privateKey = this.privateKey
 
             const token = await TokenGenerator.generateJWT<U>(user, {
                 expirationDate,
                 privateKey,
-                algorithm: this.configuration.jwt.algorithm,
+                algorithm: jwt.algorithm,
             })
 
-            // - Add long lived refresh token
-            // - Return long lived refresh token in http only cookie
+            const refreshToken = md5(user)
+            await this.tokenStorage.set(refreshToken, JSON.stringify(user))
+            await this.tokenStorage.expireIn(refreshToken, jwt.refreshToken.duration)
+
             return {
+                user,
                 token,
+                refreshToken: {
+                    token: refreshToken,
+                    duration: jwt.refreshToken.duration,
+                },
             }
         } catch (error) {
             Logger.debug(
