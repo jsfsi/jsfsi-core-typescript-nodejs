@@ -1,7 +1,6 @@
 import { Storage } from './Storage'
 import { Inject } from 'typescript-ioc'
 import { RedisClient } from 'redis'
-import { Disposable } from '@jsfsi-core/typescript-cross-platform'
 
 export abstract class RedisConfiguration {
     host: string
@@ -11,7 +10,7 @@ export abstract class RedisConfiguration {
     connect_timeout?: number
 }
 
-export class RedisStorage implements Storage<string, string>, Disposable {
+export class RedisStorage implements Storage<string, string> {
     private connection: RedisClient
 
     constructor(@Inject configuration: RedisConfiguration) {

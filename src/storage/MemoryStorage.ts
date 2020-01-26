@@ -26,7 +26,16 @@ export class MemoryStorage implements Storage<string, string> {
     async delete(key: string) {
         this.connection.del(key)
     }
+
     async clear() {
         this.connection.flushall()
+    }
+
+    dispose(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.connection.quit(error => {
+                error ? reject(error) : resolve()
+            })
+        })
     }
 }
