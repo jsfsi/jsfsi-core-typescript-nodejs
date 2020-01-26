@@ -4,8 +4,8 @@ import { UserRepository } from '../repositories/UserRepository'
 import { TokenGenerator } from '../TokenGenerator'
 import { Logger } from '../Logger'
 import { Google } from '../Google'
-import { Storage } from 'src/storage'
-import { md5 } from 'src/Hash'
+import { Storage } from '../storage'
+import { md5 } from '../Hash'
 
 export abstract class LoginServiceConfiguration {
     google: {
