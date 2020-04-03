@@ -51,3 +51,13 @@ npm install --save-dev <package_name>
 ```sh
 npm install --save ssh://git@github.com:joaosousafranco/jsfsi-core-typescript-nodejs.git
 ```
+
+## Generate JWT Key
+
+```sh
+docker run -it ubuntu bash
+apt-get update
+apt-get install keychain openssl -y
+ssh-keygen -t rsa -b 4096 -f jwt.key && openssl rsa -in jwt.key -pubout -outform PEM -out jwt.key.pub
+cat jwt.key | base64 --wrap=0 && echo "" && echo "" && cat jwt.key.pub | base64 --wrap=0 && echo "" && echo "" && cat jwt.key.pub
+```

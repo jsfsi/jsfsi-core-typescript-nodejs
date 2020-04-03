@@ -4,8 +4,9 @@ import cors from 'cors'
 import express, { Application, NextFunction, Request, Response } from 'express'
 import fs from 'fs'
 import swaggerUi from 'swagger-ui-express'
+import mung from 'express-mung'
 import { Errors, Server } from 'typescript-rest'
-import { Assets } from '@jsfsi-core/typescript-cross-platform'
+import { Assets, Link } from '@jsfsi-core/typescript-cross-platform'
 import { Logger } from '../../Logger'
 import { errorHandler as defaultErrorHandler } from './errors'
 import { ApolloServerExpressConfig, ApolloServer } from 'apollo-server-express'
@@ -14,6 +15,9 @@ import { encodeImgToBase64 } from '../../Images'
 
 export type HttpRequest = Request
 export type HttpResponse = Response
+export type HATEOASRules = {
+    [entityType: string]: <T>(entity: T, request: HttpRequest, response: Response) => Link
+}
 
 export type ErrorHandler = (
     error: Error & Errors.HttpError,
@@ -74,6 +78,7 @@ export class HttpServerBuilder {
     private _jsonOptions: OptionsJson
     private _cookieParserOptions: CookieParserOptions
     private _graphqlOptions: GraphqlOptions
+    private _hateoasRules: HATEOASRules
 
     public get port() {
         return this._port || 8080
@@ -105,6 +110,10 @@ export class HttpServerBuilder {
 
     public get graphqlOptions() {
         return this._graphqlOptions
+    }
+
+    public get hateoasRules(): HATEOASRules {
+        return this._hateoasRules
     }
 
     public withPort(port: number) {
@@ -164,6 +173,11 @@ export class HttpServerBuilder {
 
     public withGraphql(options: GraphqlOptions) {
         this._graphqlOptions = options
+        return this
+    }
+
+    public withHATEOASRules(rules: HATEOASRules) {
+        this._hateoasRules = rules
         return this
     }
 
@@ -247,6 +261,19 @@ export class HttpServer {
         this._application.use(this.builder.errorHandler || defaultErrorHandler)
     }
 
+    private setupHATEOASHandler() {
+        if (this.builder.hateoasRules && Object.keys(this.builder.hateoasRules).length) {
+            this._application.use(
+                mung.json((body, request) => {
+                    // TODO: parse body and add hateoas links
+
+                    console.log(body, request.get('Host'), request.protocol)
+                    return { test: 'test response' }
+                }),
+            )
+        }
+    }
+
     private setupJsonParse() {
         if (this.builder.jsonOptions) {
             this._application.use(express.json(this.builder.jsonOptions))
@@ -287,11 +314,11 @@ export class HttpServer {
     }
 
     public async start(): Promise<void> {
-        Server.useIoC()
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
         this.setupSwagger()
+        this.setupHATEOASHandler()
         this.setupControllers()
         this.setupErrorHandler()
         this.setupGraphql()
