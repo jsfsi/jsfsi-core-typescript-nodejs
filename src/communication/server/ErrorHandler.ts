@@ -1,7 +1,7 @@
 import { Errors } from 'typescript-rest'
-import { HttpRequest, HttpResponse } from '../HttpServer'
+import { HttpRequest, HttpResponse } from './HttpServer'
 import { NextFunction } from 'express-serve-static-core'
-import { Logger } from '../../../Logger'
+import { Logger } from '../../Logger'
 import {
     ValidationError,
     UnauthorizedError,
@@ -10,6 +10,13 @@ import {
     AuthenticationTimeoutError,
     StatusCode,
 } from '@jsfsi-core/typescript-cross-platform'
+
+export type ErrorHandler = (
+    error: Error & Errors.HttpError,
+    request: HttpRequest,
+    response: HttpResponse,
+    next: NextFunction,
+) => void
 
 export const errorHandler = (
     error: Error & Errors.HttpError,
