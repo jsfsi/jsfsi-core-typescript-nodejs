@@ -2,13 +2,13 @@ import { sign, SignOptions, verify, Algorithm } from 'jsonwebtoken'
 
 export interface JWTSigningOptions {
     expirationDate: number
-    algorithm?: Algorithm
+    algorithm?: string
     privateKey: string | Buffer
 }
 
 export interface JWTDecodingOptions {
     publicKey: string | Buffer
-    algorithms?: [Algorithm]
+    algorithms?: string[]
 }
 
 export class TokenGenerator {
@@ -18,7 +18,9 @@ export class TokenGenerator {
     ): Promise<string> => {
         return new Promise<string>((resolve, reject) => {
             try {
-                const signOptions: SignOptions = { algorithm: options.algorithm }
+                const signOptions: SignOptions = {
+                    algorithm: (options.algorithm as unknown) as Algorithm,
+                }
                 sign(
                     { ...payload, exp: options.expirationDate },
                     options.privateKey,
@@ -40,7 +42,7 @@ export class TokenGenerator {
         return new Promise<P>((resolve, reject) => {
             try {
                 const decodingOptions = {
-                    algorithms: options.algorithms,
+                    algorithms: (options.algorithms as unknown) as Algorithm[],
                 }
 
                 verify(token, options.publicKey, decodingOptions, (error, decoded) => {
