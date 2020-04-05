@@ -1,70 +1,24 @@
 import { OptionsJson } from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import express, { Application, NextFunction, Request, Response } from 'express'
-import fs from 'fs'
-import swaggerUi from 'swagger-ui-express'
-import { Errors, Server } from 'typescript-rest'
-import { Assets } from '@jsfsi-core/typescript-cross-platform'
+import express, { Application, Request, Response } from 'express'
+import { Server } from 'typescript-rest'
 import { Logger } from '../../Logger'
-import { errorHandler as defaultErrorHandler } from './errors'
-import { ApolloServerExpressConfig, ApolloServer } from 'apollo-server-express'
-import { buildSchema, BuildSchemaOptions } from 'type-graphql'
-import { encodeImgToBase64 } from '../../Images'
+import { errorHandler as defaultErrorHandler, ErrorHandler } from './ErrorHandler'
+import { SwaggerOptions, buildSwaggerOptions, setupSwagger } from './Swagger'
+import { setupGraphQL, GraphqlOptions } from './GraphQL'
+import { HateoasRules, setupHateoasRules } from './Hateoas'
+
+const DEFAULT_PORT = 8080
 
 export type HttpRequest = Request
 export type HttpResponse = Response
-
-export type ErrorHandler = (
-    error: Error & Errors.HttpError,
-    request: HttpRequest,
-    response: HttpResponse,
-    next: NextFunction,
-) => void
-
-export interface SwaggerOptions {
-    /** When specified overrides the value that exists in the generated swagger.json. */
-    version?: string
-    /** The path to the swagger file. Default is './dist/swagger.json'. */
-    swaggerFilePath?: string
-    /** Changes the label that shows up the the browser tab. Default is 'Focus-BC - Docs' */
-    pageTitle?: string
-    /** Changes the background color of the header bar. */
-    headerColor?: string
-    /** Changes the logo in the header bar. Default is the focus logo */
-    logoFilePath?: string
-    /** Changes the favicon. Default is the focus logo */
-    faviconFilePath?: string
-    /** Set the endpoint path for swagger page */
-    docsEndpoint?: string
-}
-
-type ValueOrPromise<T> = T | Promise<T>
-type Context<T = object> = T
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ContextFunction<FunctionParams = any, ProducedContext = object> = (
-    context: FunctionParams,
-) => ValueOrPromise<Context<ProducedContext>>
-export interface GraphqlOptions extends BuildSchemaOptions {
-    path: string
-    tracing?: boolean
-    introspection?: boolean
-    playground?: boolean
-    context?: Context | ContextFunction
-}
 
 interface CookieParserOptions {
     secret?: string
 }
 
 export class HttpServerBuilder {
-    private static readonly defaultLogo = Assets.jsfsiLogo
-    private static readonly defaultFavicon = Assets.jsfsiFavicon
-    private static readonly defaultTitle = 'JSFSI - Docs'
-    private static readonly defaultHeaderColor = '#FFFFFF'
-    private static readonly defaultSwaggerFile = './dist/swagger.json'
-    private static readonly defaultPort = 8080
-
     private _port: number
     private _corsDomains: string
     private _swaggerOptions: SwaggerOptions
@@ -74,6 +28,7 @@ export class HttpServerBuilder {
     private _jsonOptions: OptionsJson
     private _cookieParserOptions: CookieParserOptions
     private _graphqlOptions: GraphqlOptions
+    private _hateoasRules: HateoasRules
 
     public get port() {
         return this._port || 8080
@@ -107,8 +62,12 @@ export class HttpServerBuilder {
         return this._graphqlOptions
     }
 
+    public get hateoasRules(): HateoasRules {
+        return this._hateoasRules
+    }
+
     public withPort(port: number) {
-        this._port = port || HttpServerBuilder.defaultPort
+        this._port = port || DEFAULT_PORT
         return this
     }
 
@@ -118,25 +77,7 @@ export class HttpServerBuilder {
     }
 
     public withSwagger(swaggerOptions?: SwaggerOptions) {
-        let opts = swaggerOptions
-
-        if (!opts) {
-            opts = {}
-        }
-
-        this._swaggerOptions = {
-            version: opts.version,
-            swaggerFilePath: opts.swaggerFilePath || HttpServerBuilder.defaultSwaggerFile,
-            pageTitle: opts.pageTitle || HttpServerBuilder.defaultTitle,
-            headerColor: opts.headerColor || HttpServerBuilder.defaultHeaderColor,
-            faviconFilePath: opts.faviconFilePath
-                ? encodeImgToBase64(opts.faviconFilePath)
-                : HttpServerBuilder.defaultFavicon,
-            logoFilePath: opts.logoFilePath
-                ? encodeImgToBase64(opts.logoFilePath)
-                : HttpServerBuilder.defaultLogo,
-            docsEndpoint: opts.docsEndpoint,
-        }
+        this._swaggerOptions = buildSwaggerOptions(swaggerOptions)
 
         return this
     }
@@ -164,6 +105,11 @@ export class HttpServerBuilder {
 
     public withGraphql(options: GraphqlOptions) {
         this._graphqlOptions = options
+        return this
+    }
+
+    public withHateoasRules(rules: HateoasRules) {
+        this._hateoasRules = rules
         return this
     }
 
@@ -204,36 +150,7 @@ export class HttpServer {
 
     private setupSwagger() {
         if (this.builder.swaggerOptions) {
-            const opts = this.builder.swaggerOptions
-            const favicon = opts.faviconFilePath
-            const logo = opts.logoFilePath
-            const pageTitle = opts.pageTitle
-            const swaggerConfig = JSON.parse(
-                fs.readFileSync(opts.swaggerFilePath, 'utf8'),
-            )
-            const customCss = `.swagger-ui .topbar { background-color: ${opts.headerColor} }
-                            .swagger-ui .topbar-wrapper img { content:url(\'${logo}\') }`
-
-            if (opts.version) {
-                swaggerConfig.info.version = opts.version
-            }
-
-            const docsEndpoint = opts.docsEndpoint || '/docs'
-            Logger.info(`Swagger available in path: ${docsEndpoint}`)
-
-            this._application.use(
-                docsEndpoint,
-                swaggerUi.serve,
-                swaggerUi.setup(
-                    swaggerConfig,
-                    null,
-                    null,
-                    customCss,
-                    favicon,
-                    null,
-                    pageTitle,
-                ),
-            )
+            setupSwagger(this._application, this.builder.swaggerOptions)
         }
     }
 
@@ -245,6 +162,12 @@ export class HttpServer {
 
     private setupErrorHandler() {
         this._application.use(this.builder.errorHandler || defaultErrorHandler)
+    }
+
+    private setupHateoasRules() {
+        if (this.builder.hateoasRules && Object.keys(this.builder.hateoasRules).length) {
+            setupHateoasRules(this._application, this.builder.hateoasRules)
+        }
     }
 
     private setupJsonParse() {
@@ -261,37 +184,16 @@ export class HttpServer {
 
     private async setupGraphql() {
         if (this.builder.graphqlOptions) {
-            const {
-                path,
-                tracing,
-                playground,
-                context,
-                introspection,
-            } = this.builder.graphqlOptions
-
-            const schema = await buildSchema(this.builder.graphqlOptions)
-
-            const graphqlConfig: ApolloServerExpressConfig = {
-                schema,
-                tracing,
-                playground,
-                context,
-                introspection,
-            }
-
-            const graphqlServer = new ApolloServer(graphqlConfig)
-
-            Logger.info('Graphql playground available in path: /graphql')
-            graphqlServer.applyMiddleware({ app: this._application, path })
+            await setupGraphQL(this._application, this.builder.graphqlOptions)
         }
     }
 
     public async start(): Promise<void> {
-        Server.useIoC()
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
         this.setupSwagger()
+        this.setupHateoasRules()
         this.setupControllers()
         this.setupErrorHandler()
         this.setupGraphql()

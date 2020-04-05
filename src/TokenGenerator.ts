@@ -1,14 +1,14 @@
-import { sign, SignOptions, verify } from 'jsonwebtoken'
+import { sign, SignOptions, verify, Algorithm } from 'jsonwebtoken'
 
 export interface JWTSigningOptions {
     expirationDate: number
-    algorithm?: string
+    algorithm?: Algorithm
     privateKey: string | Buffer
 }
 
 export interface JWTDecodingOptions {
     publicKey: string | Buffer
-    algorithms?: [string]
+    algorithms?: [Algorithm]
 }
 
 export class TokenGenerator {

@@ -89,7 +89,7 @@ describe('Verify JWT token', () => {
         try {
             await TokenGenerator.verifyJWT<Payload>(token, {
                 publicKey: Buffer.from(Configuration.jwt.publicKey, 'base64'),
-                algorithms: ['123'],
+                algorithms: ['PS512'],
             })
         } catch (error) {
             expect(error).toBeTruthy()
