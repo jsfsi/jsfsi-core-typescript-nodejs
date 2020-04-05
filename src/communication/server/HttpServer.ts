@@ -198,6 +198,8 @@ export class HttpServer {
         this.setupErrorHandler()
         this.setupGraphql()
 
+        this._application.set('trust proxy', true)
+
         return new Promise<void>(resolve => {
             this._application.listen(this.builder.port, () => {
                 Logger.info(`Server listening on port ${this.builder.port}`)
