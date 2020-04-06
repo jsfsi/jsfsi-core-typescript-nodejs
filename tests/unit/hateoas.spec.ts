@@ -1,6 +1,9 @@
 import { HateoasRules, HateoasParser } from '../../src'
-import { Link, HttpMethods } from '@jsfsi-core/typescript-cross-platform'
-import { ValidationError } from '@jsfsi-core/typescript-cross-platform'
+import {
+    Link,
+    HttpMethods,
+    InternalServerError,
+} from '@jsfsi-core/typescript-cross-platform'
 
 class TestEntity {
     constructor(public name: string, public id: string) {}
@@ -25,19 +28,19 @@ const mockedHttpsRequest = {
 describe('Parse hateoas', () => {
     const hateoasRules: HateoasRules = {
         TestEntity: (entity: TestEntity, request) => {
-            return {
+            return Object.assign(new Link(), {
                 rel: entity.constructor.name,
                 method: HttpMethods.GET,
                 href: `${request.protocol}://${request.get('Host')}/test/${entity.id}`,
-            } as Link
+            })
         },
         SubTestEntity: (entity: SubTestEntity, request) => {
-            return {
+            return Object.assign(new Link(), {
                 rel: entity.constructor.name,
                 method: HttpMethods.GET,
                 href: `${request.protocol}://${request.get('Host')}/subtest/${entity.id}`,
                 target: entity.action,
-            } as Link
+            })
         },
     }
 
@@ -57,11 +60,11 @@ describe('Parse hateoas', () => {
         expect(hateoasEntity).toStrictEqual({
             test: 'test',
             _links: {
-                test: {
+                test: Object.assign(new Link(), {
                     rel: 'TestEntity',
                     href: 'http://testdomain/test/124',
                     method: 'get',
-                },
+                }),
             },
         })
     })
@@ -80,11 +83,11 @@ describe('Parse hateoas', () => {
         expect(hateoasEntity).toStrictEqual({
             test: 'test',
             _links: {
-                test: {
+                test: Object.assign(new Link(), {
                     rel: 'TestEntity',
                     href: 'https://testdomain/test/124',
                     method: 'get',
-                },
+                }),
             },
         })
     })
@@ -111,20 +114,43 @@ describe('Parse hateoas', () => {
             subTest: {
                 name: 'subtest',
                 _links: {
-                    subtest: {
+                    subtest: Object.assign(new Link(), {
                         rel: 'SubTestEntity',
                         href: 'http://testdomain/subtest/421',
                         method: 'get',
                         target: 'something',
-                    },
+                    }),
                 },
             },
             _links: {
-                test: {
+                test: Object.assign(new Link(), {
                     rel: 'TestEntity',
                     href: 'http://testdomain/test/124',
                     method: 'get',
+                }),
+            },
+        })
+    })
+
+    it('Entity of type Link should not raise an exception', () => {
+        const hateoasEntity = hateoasParser.parseLinks(
+            {
+                test: 'test',
+                _links: {
+                    test: Object.assign(new Link(), {
+                        rel: 'test',
+                    }),
                 },
+            },
+            mockedHttpRequest,
+        )
+
+        expect(hateoasEntity).toStrictEqual({
+            test: 'test',
+            _links: {
+                test: Object.assign(new Link(), {
+                    rel: 'test',
+                }),
             },
         })
     })
@@ -140,6 +166,6 @@ describe('Parse hateoas', () => {
                 },
                 mockedHttpRequest,
             ),
-        ).toThrow(ValidationError)
+        ).toThrow(InternalServerError)
     })
 })

@@ -9,6 +9,7 @@ import {
     NotFoundError,
     AuthenticationTimeoutError,
     StatusCode,
+    InternalServerError,
 } from '@jsfsi-core/typescript-cross-platform'
 
 export type ErrorHandler = (
@@ -32,6 +33,7 @@ export const errorHandler = (
             (error instanceof UnauthorizedError && StatusCode.UNAUTHORIZED) ||
             (error instanceof ForbiddenError && StatusCode.FORBIDDEN) ||
             (error instanceof NotFoundError && StatusCode.NOT_FOUND) ||
+            (error instanceof InternalServerError && StatusCode.INTERNAL_SERVER_ERROR) ||
             (error instanceof AuthenticationTimeoutError &&
                 StatusCode.AUTHENTICATION_TIMEOUT) ||
             StatusCode.INTERNAL_SERVER_ERROR

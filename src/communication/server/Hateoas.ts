@@ -1,7 +1,6 @@
 import mung from 'express-mung'
 import { Request, Response, Application } from 'express'
-import { Link } from '@jsfsi-core/typescript-cross-platform'
-import { ValidationError } from '@jsfsi-core/typescript-cross-platform'
+import { Link, InternalServerError } from '@jsfsi-core/typescript-cross-platform'
 
 // TODO: Improve this file to use types instead of any
 
@@ -57,12 +56,14 @@ export class HateoasParser {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private processEntity = (entity: any, request?: Request, response?: Response) => {
         const entityClass = entity?.constructor?.name
-        if (!this.rules[entityClass]) {
-            throw new ValidationError(
+        if (!this.rules[entityClass] && entityClass !== Link.name) {
+            throw new InternalServerError(
                 `The entity class ${entityClass} doesn't have a HateoasRule defined`,
             )
         }
 
-        return this.rules[entityClass](entity, request, response)
+        return this.rules[entityClass]
+            ? this.rules[entityClass](entity, request, response)
+            : entity
     }
 }
