@@ -2,7 +2,7 @@ import { OptionsJson } from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { Application, Request, Response } from 'express'
-import { Server } from 'typescript-rest'
+import { Server, ServiceAuthenticator } from 'typescript-rest'
 import { Logger } from '../../Logger'
 import { errorHandler as defaultErrorHandler, ErrorHandler } from './ErrorHandler'
 import { SwaggerOptions, buildSwaggerOptions, setupSwagger } from './Swagger'
@@ -29,6 +29,7 @@ export class HttpServerBuilder {
     private _cookieParserOptions: CookieParserOptions
     private _graphqlOptions: GraphqlOptions
     private _hateoasRules: HateoasRules
+    private _authenticator: ServiceAuthenticator
 
     public get port() {
         return this._port || 8080
@@ -64,6 +65,10 @@ export class HttpServerBuilder {
 
     public get hateoasRules(): HateoasRules {
         return this._hateoasRules
+    }
+
+    public get authenticator(): ServiceAuthenticator {
+        return this._authenticator
     }
 
     public withPort(port: number) {
@@ -110,6 +115,11 @@ export class HttpServerBuilder {
 
     public withHateoasRules(rules: HateoasRules) {
         this._hateoasRules = rules
+        return this
+    }
+
+    public withAuthenticator(authenticator: ServiceAuthenticator) {
+        this._authenticator = authenticator
         return this
     }
 
@@ -188,15 +198,22 @@ export class HttpServer {
         }
     }
 
+    private setupAuthenticator() {
+        if (this.builder.authenticator) {
+            Server.registerAuthenticator(this.builder.authenticator)
+        }
+    }
+
     public async start(): Promise<void> {
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
+        this.setupAuthenticator()
         this.setupSwagger()
         this.setupHateoasRules()
         this.setupControllers()
         this.setupErrorHandler()
-        this.setupGraphql()
+        await this.setupGraphql()
 
         this._application.set('trust proxy', true)
 
