@@ -7,6 +7,7 @@ import { JWTRequest } from './JWTRequest'
 
 const BEARER_LENGTH = 'Bearer '.length
 
+export const TENANT_HEADER = 'X-Api-Tenant'
 export interface TenantToken {
     roles: string[]
 }
@@ -20,7 +21,7 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     constructor(private publicKeyBase64: string, private algorithm: string) {}
 
     getRoles(request: Request<ParamsDictionary>) {
-        const tenantId = request.get('X-Api-Tenant')
+        const tenantId = request.get(TENANT_HEADER)
         const user = request && (request as JWTRequest<U>).user
 
         return user?.tenants?.[tenantId]?.roles || []
