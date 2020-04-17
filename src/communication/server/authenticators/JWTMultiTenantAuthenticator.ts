@@ -8,7 +8,10 @@ import { JWTRequest } from './JWTRequest'
 const BEARER_LENGTH = 'Bearer '.length
 
 export const TENANT_HEADER = 'X-Api-Tenant'
+export const ADMIN_ROLE = 'admin'
+
 export interface TenantToken {
+    isAdmin: boolean
     roles: string[]
 }
 
@@ -23,8 +26,16 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     getRoles(request: Request<ParamsDictionary>) {
         const tenantId = request.get(TENANT_HEADER)
         const user = request && (request as JWTRequest<U>).user
+        const tenant = user?.tenants?.[tenantId]
 
-        return user?.tenants?.[tenantId]?.roles || []
+        let roles: string[] = []
+
+        if (tenant) {
+            roles = tenant.roles
+            tenant.isAdmin && roles.push(ADMIN_ROLE)
+        }
+
+        return roles
     }
 
     initialize() {
