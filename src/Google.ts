@@ -5,6 +5,8 @@ export interface GoogleUser {
     aud: string
     sub: string
     email: string
+    name: string
+    picture: string
 }
 
 export class Google {
