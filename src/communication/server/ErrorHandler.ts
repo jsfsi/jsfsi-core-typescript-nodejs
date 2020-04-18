@@ -11,6 +11,7 @@ import {
     StatusCode,
     InternalServerError,
 } from '@jsfsi-core/typescript-cross-platform'
+import { BadRequestError } from 'typescript-rest/dist/server/model/errors'
 
 export type ErrorHandler = (
     error: Error & Errors.HttpError,
@@ -30,6 +31,7 @@ export const errorHandler = (
         const statusCode =
             error.statusCode ||
             (error instanceof ValidationError && StatusCode.BAD_REQUEST) ||
+            (error instanceof BadRequestError && StatusCode.BAD_REQUEST) ||
             (error instanceof UnauthorizedError && StatusCode.UNAUTHORIZED) ||
             (error instanceof ForbiddenError && StatusCode.FORBIDDEN) ||
             (error instanceof NotFoundError && StatusCode.NOT_FOUND) ||
