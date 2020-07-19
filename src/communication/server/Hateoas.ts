@@ -1,6 +1,7 @@
 import mung from 'express-mung'
 import { Request, Response, Application } from 'express'
 import { Link, InternalServerError } from '@jsfsi-core/typescript-cross-platform'
+import { Logger } from '../../Logger'
 
 // TODO: Improve this file to use types instead of any
 
@@ -49,6 +50,7 @@ export class HateoasParser {
     private parseBodyLinks = (links: any, request?: Request, response?: Response) => {
         Object.keys(links).forEach(key => {
             const entity = links[key]
+            Logger.debug(`Hateoas process body link: ${key}`)
             links[key] = this.processEntity(entity, request, response)
         })
     }
@@ -58,7 +60,9 @@ export class HateoasParser {
         const entityClass = entity?.constructor?.name
         if (!this.rules[entityClass] && entityClass !== Link.name) {
             throw new InternalServerError(
-                `The entity class ${entityClass} doesn't have a HateoasRule defined`,
+                `The entity class ${entityClass} doesn't have a HateoasRule defined: ${JSON.stringify(
+                    entity || {},
+                )}`,
             )
         }
 
