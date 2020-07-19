@@ -42,19 +42,25 @@ export class HateoasParser {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public parseLinks = (body: any, request?: Request, response?: Response) => {
-        if (body) {
-            Object.keys(body).forEach(key => {
+        const parsedBody = { ...body }
+
+        if (parsedBody) {
+            Object.keys(parsedBody).forEach(key => {
                 if (key === '_links') {
-                    this.parseBodyLinks(body._links, request, response)
+                    this.parseBodyLinks(parsedBody._links, request, response)
                 } else {
-                    if (typeof body[key] === 'object') {
-                        body[key] = this.parseLinks(body[key], request, response)
+                    if (typeof parsedBody[key] === 'object') {
+                        parsedBody[key] = this.parseLinks(
+                            parsedBody[key],
+                            request,
+                            response,
+                        )
                     }
                 }
             })
         }
 
-        return body
+        return parsedBody
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
