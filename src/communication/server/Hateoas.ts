@@ -1,6 +1,10 @@
 import mung from 'express-mung'
 import { Request, Response, Application } from 'express'
-import { Link, InternalServerError } from '@jsfsi-core/typescript-cross-platform'
+import {
+    Link,
+    SimpleHateoasRule,
+    InternalServerError,
+} from '@jsfsi-core/typescript-cross-platform'
 import { Logger } from '../../Logger'
 
 // TODO: Improve this file to use types instead of any
@@ -14,14 +18,6 @@ export type HateoasRules = {
         request?: Request,
         response?: Response,
     ) => Link | Link[]
-}
-
-export class SimpleHateoasRule {
-    constructor(private _link: Link) {}
-
-    public get link(): Link {
-        return this._link
-    }
 }
 
 export const setupHateoasRules = (application: Application, rules: HateoasRules) => {
