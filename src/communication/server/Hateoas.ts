@@ -70,6 +70,11 @@ export class HateoasParser {
     private processEntity = (entity: any, request?: Request, response?: Response) => {
         const entityClass = entity?.constructor?.name
         if (!this.rules[entityClass] && entityClass !== Link.name) {
+            Logger.error(
+                `The entity class ${entityClass} doesn't have a HateoasRule defined: ${JSON.stringify(
+                    entity || {},
+                )}`,
+            )
             throw new InternalServerError(
                 `The entity class ${entityClass} doesn't have a HateoasRule defined: ${JSON.stringify(
                     entity || {},
