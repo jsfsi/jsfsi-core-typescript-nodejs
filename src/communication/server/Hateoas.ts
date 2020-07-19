@@ -16,8 +16,25 @@ export type HateoasRules = {
     ) => Link | Link[]
 }
 
+export class SimpleHateoasRule {
+    constructor(private _link: Link) {}
+
+    public get link(): Link {
+        return this._link
+    }
+}
+
 export const setupHateoasRules = (application: Application, rules: HateoasRules) => {
-    hateoasParser = new HateoasParser(rules)
+    const rulesCollection = {
+        ...rules,
+        SimpleHateoasRule: (entity: SimpleHateoasRule, request: Request) => {
+            return {
+                ...entity.link,
+                href: `${request.protocol}://${request.get('Host')}${entity.link.href}`,
+            } as Link
+        },
+    }
+    hateoasParser = new HateoasParser(rulesCollection)
     application.use(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         mung.json((body: any, request, response) => {
