@@ -1,4 +1,4 @@
-import { HateoasRules, HateoasParser } from '../../src'
+import { HateoasRules, HateoasParser, Logger } from '../../src'
 import {
     Link,
     HttpMethods,
@@ -28,14 +28,14 @@ const mockedHttpsRequest = {
 describe('Parse hateoas', () => {
     const hateoasRules: HateoasRules = {
         TestEntity: (entity: TestEntity, request) => {
-            return Object.assign(new Link(), {
+            return new Link({
                 rel: entity.constructor.name,
                 method: HttpMethods.GET,
                 href: `${request.protocol}://${request.get('Host')}/test/${entity.id}`,
             })
         },
         SubTestEntity: (entity: SubTestEntity, request) => {
-            return Object.assign(new Link(), {
+            return new Link({
                 rel: entity.constructor.name,
                 method: HttpMethods.GET,
                 href: `${request.protocol}://${request.get('Host')}/subtest/${entity.id}`,
@@ -45,6 +45,10 @@ describe('Parse hateoas', () => {
     }
 
     const hateoasParser = new HateoasParser(hateoasRules)
+
+    beforeAll(() => {
+        Logger.configure('info')
+    })
 
     it('Entity with 1 level fields and http protocol with success', () => {
         const hateoasEntity = hateoasParser.parseLinks(
@@ -60,10 +64,10 @@ describe('Parse hateoas', () => {
         expect(hateoasEntity).toStrictEqual({
             test: 'test',
             _links: {
-                test: Object.assign(new Link(), {
+                test: new Link({
                     rel: 'TestEntity',
                     href: 'http://testdomain/test/124',
-                    method: 'get',
+                    method: HttpMethods.GET,
                 }),
             },
         })
@@ -83,10 +87,10 @@ describe('Parse hateoas', () => {
         expect(hateoasEntity).toStrictEqual({
             test: 'test',
             _links: {
-                test: Object.assign(new Link(), {
+                test: new Link({
                     rel: 'TestEntity',
                     href: 'https://testdomain/test/124',
-                    method: 'get',
+                    method: HttpMethods.GET,
                 }),
             },
         })
@@ -114,19 +118,19 @@ describe('Parse hateoas', () => {
             subTest: {
                 name: 'subtest',
                 _links: {
-                    subtest: Object.assign(new Link(), {
+                    subtest: new Link({
                         rel: 'SubTestEntity',
                         href: 'http://testdomain/subtest/421',
-                        method: 'get',
+                        method: HttpMethods.GET,
                         target: 'something',
                     }),
                 },
             },
             _links: {
-                test: Object.assign(new Link(), {
+                test: new Link({
                     rel: 'TestEntity',
                     href: 'http://testdomain/test/124',
-                    method: 'get',
+                    method: HttpMethods.GET,
                 }),
             },
         })
@@ -137,8 +141,10 @@ describe('Parse hateoas', () => {
             {
                 test: 'test',
                 _links: {
-                    test: Object.assign(new Link(), {
+                    test: new Link({
                         rel: 'test',
+                        href: 'http://testdomain/test/124',
+                        method: HttpMethods.GET,
                     }),
                 },
             },
@@ -148,8 +154,10 @@ describe('Parse hateoas', () => {
         expect(hateoasEntity).toStrictEqual({
             test: 'test',
             _links: {
-                test: Object.assign(new Link(), {
+                test: new Link({
                     rel: 'test',
+                    href: 'http://testdomain/test/124',
+                    method: HttpMethods.GET,
                 }),
             },
         })

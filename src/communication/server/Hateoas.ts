@@ -42,7 +42,7 @@ export class HateoasParser {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public parseLinks = (body: any, request?: Request, response?: Response) => {
-        const parsedBody = { ...body }
+        const parsedBody = Object.assign({}, body)
 
         if (parsedBody) {
             Object.keys(parsedBody).forEach(key => {
