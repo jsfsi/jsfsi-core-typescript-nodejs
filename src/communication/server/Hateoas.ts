@@ -25,8 +25,8 @@ export const setupHateoasRules = (application: Application, rules: HateoasRules)
         ...rules,
         SimpleHateoasRule: (entity: SimpleHateoasRule, request: Request) => {
             return {
-                ...entity.link,
-                href: `${request.protocol}://${request.get('Host')}${entity.link.href}`,
+                ...entity,
+                href: `${request.protocol}://${request.get('Host')}${entity.href}`,
             } as Link
         },
     }
