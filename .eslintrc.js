@@ -1,4 +1,4 @@
-// Note: I prefer using a JavaScript file for the .eslintrc file (instead of a JSON file) 
+// Note: I prefer using a JavaScript file for the .eslintrc file (instead of a JSON file)
 // as it supports comments that can be used to better describe rules.
 module.exports = {
   parser: '@typescript-eslint/parser',  // Specifies the ESLint parser
@@ -16,6 +16,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_*' }],
     '@typescript-eslint/member-delimiter-style': ['error', {
       multiline: {
         delimiter: 'none',

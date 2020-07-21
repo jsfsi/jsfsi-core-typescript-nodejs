@@ -24,12 +24,9 @@ export const errorHandler = (
     error: Error & Errors.HttpError,
     _: HttpRequest,
     response: HttpResponse,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     __: NextFunction,
 ) => {
     if (error) {
-        Logger.debug('Default error handler:', error)
-
         const statusCode =
             error.statusCode ||
             (error instanceof ValidationError && StatusCode.BAD_REQUEST) ||
@@ -42,7 +39,13 @@ export const errorHandler = (
                 StatusCode.AUTHENTICATION_TIMEOUT) ||
             StatusCode.INTERNAL_SERVER_ERROR
 
-        const location = (error as UnauthorizedError).location
+        Logger.debug(
+            'Default error handler:',
+            statusCode,
+            typeof error,
+            error.name,
+            error.message,
+        )
 
         // Remove errors trace from the message that will be send to client
         const message =
@@ -54,6 +57,6 @@ export const errorHandler = (
             Logger.error(error)
         }
 
-        response.status(statusCode).send({ error: message, location })
+        response.status(statusCode).send({ error: message })
     }
 }
