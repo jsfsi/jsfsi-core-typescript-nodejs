@@ -27,6 +27,8 @@ export const errorHandler = (
     __: NextFunction,
 ) => {
     if (error) {
+        Logger.debug('ValidationError', ValidationError.name)
+
         const statusCode =
             error.statusCode ||
             (error instanceof ValidationError && StatusCode.BAD_REQUEST) ||
@@ -38,6 +40,8 @@ export const errorHandler = (
             (error instanceof AuthenticationTimeoutError &&
                 StatusCode.AUTHENTICATION_TIMEOUT) ||
             StatusCode.INTERNAL_SERVER_ERROR
+
+        const location = (error as UnauthorizedError).location
 
         Logger.debug(
             'Default error handler:',
@@ -57,6 +61,6 @@ export const errorHandler = (
             Logger.error(error)
         }
 
-        response.status(statusCode).send({ error: message })
+        response.status(statusCode).send({ error: message, location })
     }
 }
