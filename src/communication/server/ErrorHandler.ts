@@ -10,8 +10,8 @@ import {
     AuthenticationTimeoutError,
     StatusCode,
     InternalServerError,
+    BadRequestError,
 } from '@jsfsi-core/typescript-cross-platform'
-import { BadRequestError } from 'typescript-rest/dist/server/model/errors'
 
 export type ErrorHandler = (
     error: Error & Errors.HttpError,
@@ -27,29 +27,22 @@ export const errorHandler = (
     __: NextFunction,
 ) => {
     if (error) {
-        Logger.debug('ValidationError', ValidationError.name)
-
         const statusCode =
             error.statusCode ||
-            (error instanceof ValidationError && StatusCode.BAD_REQUEST) ||
-            (error instanceof BadRequestError && StatusCode.BAD_REQUEST) ||
-            (error instanceof UnauthorizedError && StatusCode.UNAUTHORIZED) ||
-            (error instanceof ForbiddenError && StatusCode.FORBIDDEN) ||
-            (error instanceof NotFoundError && StatusCode.NOT_FOUND) ||
-            (error instanceof InternalServerError && StatusCode.INTERNAL_SERVER_ERROR) ||
-            (error instanceof AuthenticationTimeoutError &&
+            (error.name == ValidationError.name && StatusCode.BAD_REQUEST) ||
+            (error.name == BadRequestError.name && StatusCode.BAD_REQUEST) ||
+            (error.name == UnauthorizedError.name && StatusCode.UNAUTHORIZED) ||
+            (error.name == ForbiddenError.name && StatusCode.FORBIDDEN) ||
+            (error.name == NotFoundError.name && StatusCode.NOT_FOUND) ||
+            (error.name == InternalServerError.name &&
+                StatusCode.INTERNAL_SERVER_ERROR) ||
+            (error.name == AuthenticationTimeoutError.name &&
                 StatusCode.AUTHENTICATION_TIMEOUT) ||
             StatusCode.INTERNAL_SERVER_ERROR
 
         const location = (error as UnauthorizedError).location
 
-        Logger.debug(
-            'Default error handler:',
-            statusCode,
-            typeof error,
-            error.name,
-            error.message,
-        )
+        Logger.debug('Default error handler:', statusCode, error.name, error.message)
 
         // Remove errors trace from the message that will be send to client
         const message =
