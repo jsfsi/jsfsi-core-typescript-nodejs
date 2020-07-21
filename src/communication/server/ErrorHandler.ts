@@ -28,6 +28,8 @@ export const errorHandler = (
     __: NextFunction,
 ) => {
     if (error) {
+        Logger.debug('Default error handler:', error)
+
         const statusCode =
             error.statusCode ||
             (error instanceof ValidationError && StatusCode.BAD_REQUEST) ||
