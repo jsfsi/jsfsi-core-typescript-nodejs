@@ -49,6 +49,7 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     getMiddleware(): RequestHandler<ParamsDictionary> {
         return async (request, __, next) => {
             const authorizationHeader = request.headers?.authorization
+            Logger.debug('Process authorization header in JWTMultiTenantAuthenticator')
 
             if (authorizationHeader) {
                 const jwt = authorizationHeader.substring(
