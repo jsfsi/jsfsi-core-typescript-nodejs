@@ -9,6 +9,8 @@ import { errorHandler as defaultErrorHandler, ErrorHandler } from './ErrorHandle
 import { SwaggerOptions, buildSwaggerOptions, setupSwagger } from './Swagger'
 import { setupGraphQL, GraphqlOptions } from './GraphQL'
 import { HateoasRules, setupHateoasRules } from './Hateoas'
+import { HttpMethods, StatusCode } from '@jsfsi-core/typescript-cross-platform'
+import { MemoryStorage, Storage } from '../..'
 
 const DEFAULT_PORT = 8080
 
@@ -43,6 +45,7 @@ export class HttpServerBuilder {
     private _graphqlOptions: GraphqlOptions
     private _hateoasRules: HateoasRules
     private _authenticator: ServiceAuthenticator
+    private _cacheEtag: boolean
     private _customMiddlewares: CustomMiddlewares = {
         [CUSTOM_MIDDLEWARE_ORDER.BEFORE_CONTROLLERS]: [],
         [CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS]: [],
@@ -86,6 +89,10 @@ export class HttpServerBuilder {
 
     public get authenticator(): ServiceAuthenticator {
         return this._authenticator
+    }
+
+    public get cacheEtag(): boolean {
+        return this._cacheEtag
     }
 
     public get customMiddlewares(): CustomMiddlewares {
@@ -143,6 +150,11 @@ export class HttpServerBuilder {
         return this
     }
 
+    public withCacheEtag() {
+        this._cacheEtag = true
+        return this
+    }
+
     public withCustomMiddleware(
         order: CUSTOM_MIDDLEWARE_ORDER,
         middleware: CustomMiddleware,
@@ -159,6 +171,7 @@ export class HttpServerBuilder {
 export class HttpServer {
     private _application: Application
     private builder: HttpServerBuilder
+    private etagStorage: Storage<string, string> = new MemoryStorage()
 
     constructor(builder: HttpServerBuilder) {
         this.builder = builder
@@ -232,6 +245,41 @@ export class HttpServer {
         }
     }
 
+    private setupCacheEtag() {
+        if (this.builder.cacheEtag) {
+            this.builder
+                .withCustomMiddleware(
+                    CUSTOM_MIDDLEWARE_ORDER.BEFORE_CONTROLLERS,
+                    async (request, response, next) => {
+                        const etag = request.header('if-none-match') as string
+                        const cachedEtag = await this.etagStorage.get(request.url)
+
+                        if (
+                            request.method.toLowerCase() === HttpMethods.GET &&
+                            etag &&
+                            cachedEtag === etag
+                        ) {
+                            response.statusCode = StatusCode.NOT_MODIFIED
+                            response.setHeader('etag', etag)
+                            response.send()
+                        } else {
+                            next()
+                        }
+                    },
+                )
+                .withCustomMiddleware(
+                    CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS,
+                    async (request, response, next) => {
+                        const etag = response.getHeader('etag') as string
+                        if (etag && request.method.toLowerCase() === HttpMethods.GET) {
+                            await this.etagStorage.set(request.url, etag)
+                        }
+                        next()
+                    },
+                )
+        }
+    }
+
     private setupCustomMiddlewares(order: CUSTOM_MIDDLEWARE_ORDER) {
         this.builder.customMiddlewares[order].forEach(middleware =>
             this._application.use(middleware),
@@ -242,6 +290,7 @@ export class HttpServer {
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
+        this.setupCacheEtag()
         this.setupCustomMiddlewares(CUSTOM_MIDDLEWARE_ORDER.BEFORE_CONTROLLERS)
         this.setupAuthenticator()
         this.setupSwagger()
