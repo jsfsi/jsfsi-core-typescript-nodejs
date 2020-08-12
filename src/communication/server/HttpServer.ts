@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { OptionsJson } from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -11,6 +12,11 @@ import { HateoasRules, setupHateoasRules } from './Hateoas'
 
 const DEFAULT_PORT = 8080
 
+export enum CUSTOM_MIDDLEWARE_ORDER {
+    BEFORE_CONTROLLERS,
+    AFTER_CONTROLLERS,
+}
+
 export type HttpRequest = Request
 export type HttpResponse = Response
 export type CustomMiddleware = (
@@ -18,6 +24,9 @@ export type CustomMiddleware = (
     res: HttpResponse,
     next: NextFunction,
 ) => any
+type CustomMiddlewares = {
+    [key: string]: CustomMiddleware[]
+}
 
 interface CookieParserOptions {
     secret?: string
@@ -27,7 +36,6 @@ export class HttpServerBuilder {
     private _port: number
     private _corsDomains: string
     private _swaggerOptions: SwaggerOptions
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _controllers: Array<any>
     private _errorHandler: ErrorHandler
     private _jsonOptions: OptionsJson
@@ -35,7 +43,10 @@ export class HttpServerBuilder {
     private _graphqlOptions: GraphqlOptions
     private _hateoasRules: HateoasRules
     private _authenticator: ServiceAuthenticator
-    private _customMiddlewares: CustomMiddleware[] = []
+    private _customMiddlewares: CustomMiddlewares = {
+        [CUSTOM_MIDDLEWARE_ORDER.BEFORE_CONTROLLERS]: [],
+        [CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS]: [],
+    }
 
     public get port() {
         return this._port || 8080
@@ -77,7 +88,7 @@ export class HttpServerBuilder {
         return this._authenticator
     }
 
-    public get customMiddlewares(): CustomMiddleware[] {
+    public get customMiddlewares(): CustomMiddlewares {
         return this._customMiddlewares
     }
 
@@ -97,7 +108,6 @@ export class HttpServerBuilder {
         return this
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public withControllers(controllers: Array<any>) {
         this._controllers = controllers
         return this
@@ -133,8 +143,11 @@ export class HttpServerBuilder {
         return this
     }
 
-    public withCustomMiddleware(middleware: CustomMiddleware) {
-        this._customMiddlewares.push(middleware)
+    public withCustomMiddleware(
+        order: CUSTOM_MIDDLEWARE_ORDER,
+        middleware: CustomMiddleware,
+    ) {
+        this._customMiddlewares[order].push(middleware)
         return this
     }
 
@@ -219,8 +232,8 @@ export class HttpServer {
         }
     }
 
-    private setupCustomMiddlewares() {
-        this.builder.customMiddlewares.forEach(middleware =>
+    private setupCustomMiddlewares(order: CUSTOM_MIDDLEWARE_ORDER) {
+        this.builder.customMiddlewares[order].forEach(middleware =>
             this._application.use(middleware),
         )
     }
@@ -229,13 +242,14 @@ export class HttpServer {
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
-        this.setupCustomMiddlewares()
+        this.setupCustomMiddlewares(CUSTOM_MIDDLEWARE_ORDER.BEFORE_CONTROLLERS)
         this.setupAuthenticator()
         this.setupSwagger()
         this.setupHateoasRules()
         this.setupControllers()
         this.setupErrorHandler()
         await this.setupGraphql()
+        this.setupCustomMiddlewares(CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS)
 
         this._application.set('trust proxy', true)
 
