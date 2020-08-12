@@ -1,7 +1,7 @@
 import { OptionsJson } from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response, NextFunction } from 'express'
 import { Server, ServiceAuthenticator } from 'typescript-rest'
 import { Logger } from '../../Logger'
 import { errorHandler as defaultErrorHandler, ErrorHandler } from './ErrorHandler'
@@ -13,6 +13,11 @@ const DEFAULT_PORT = 8080
 
 export type HttpRequest = Request
 export type HttpResponse = Response
+export type CustomMiddleware = (
+    req: HttpRequest,
+    res: HttpResponse,
+    next: NextFunction,
+) => any
 
 interface CookieParserOptions {
     secret?: string
@@ -30,6 +35,7 @@ export class HttpServerBuilder {
     private _graphqlOptions: GraphqlOptions
     private _hateoasRules: HateoasRules
     private _authenticator: ServiceAuthenticator
+    private _customMiddlewares: CustomMiddleware[] = []
 
     public get port() {
         return this._port || 8080
@@ -69,6 +75,10 @@ export class HttpServerBuilder {
 
     public get authenticator(): ServiceAuthenticator {
         return this._authenticator
+    }
+
+    public get customMiddlewares(): CustomMiddleware[] {
+        return this._customMiddlewares
     }
 
     public withPort(port: number) {
@@ -120,6 +130,11 @@ export class HttpServerBuilder {
 
     public withAuthenticator(authenticator: ServiceAuthenticator) {
         this._authenticator = authenticator
+        return this
+    }
+
+    public withCustomMiddleware(middleware: CustomMiddleware) {
+        this._customMiddlewares.push(middleware)
         return this
     }
 
@@ -204,10 +219,17 @@ export class HttpServer {
         }
     }
 
+    private setupCustomMiddlewares() {
+        this.builder.customMiddlewares.forEach(middleware =>
+            this._application.use(middleware),
+        )
+    }
+
     public async start(): Promise<void> {
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
+        this.setupCustomMiddlewares()
         this.setupAuthenticator()
         this.setupSwagger()
         this.setupHateoasRules()
