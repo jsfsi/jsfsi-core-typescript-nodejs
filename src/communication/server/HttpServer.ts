@@ -254,7 +254,7 @@ export class HttpServer {
                         const etag = request.header('if-none-match') as string
                         const cachedEtag = await this.etagStorage.get(request.url)
 
-                        if (cachedEtag === etag) {
+                        if (etag && cachedEtag === etag) {
                             response.statusCode = StatusCode.NOT_MODIFIED
                             response.setHeader('etag', etag)
                             response.send()
