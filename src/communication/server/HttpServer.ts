@@ -254,11 +254,7 @@ export class HttpServer {
                         const etag = request.header('if-none-match') as string
                         const cachedEtag = await this.etagStorage.get(request.url)
 
-                        if (
-                            request.method.toLowerCase() === HttpMethods.GET &&
-                            etag &&
-                            cachedEtag === etag
-                        ) {
+                        if (cachedEtag === etag) {
                             response.statusCode = StatusCode.NOT_MODIFIED
                             response.setHeader('etag', etag)
                             response.send()
@@ -271,7 +267,7 @@ export class HttpServer {
                     CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS,
                     async (request, response, next) => {
                         const etag = response.getHeader('etag') as string
-                        if (etag && request.method.toLowerCase() === HttpMethods.GET) {
+                        if (etag) {
                             await this.etagStorage.set(request.url, etag)
                         }
                         next()
