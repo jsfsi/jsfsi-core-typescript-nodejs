@@ -9,7 +9,7 @@ import { errorHandler as defaultErrorHandler, ErrorHandler } from './ErrorHandle
 import { SwaggerOptions, buildSwaggerOptions, setupSwagger } from './Swagger'
 import { setupGraphQL, GraphqlOptions } from './GraphQL'
 import { HateoasRules, setupHateoasRules } from './Hateoas'
-import { HttpMethods, StatusCode } from '@jsfsi-core/typescript-cross-platform'
+import { StatusCode } from '@jsfsi-core/typescript-cross-platform'
 import { MemoryStorage, Storage } from '../..'
 
 const DEFAULT_PORT = 8080
