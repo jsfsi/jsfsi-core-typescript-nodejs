@@ -71,7 +71,6 @@ export class HateoasParser {
     private parseBodyLinks = (links: any, request?: Request, response?: Response) => {
         Object.keys(links).forEach(key => {
             const entity = links[key]
-            Logger.debug(`Hateoas process body link: ${key}`)
             links[key] = this.processEntity(entity, request, response)
         })
     }
