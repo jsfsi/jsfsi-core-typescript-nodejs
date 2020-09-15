@@ -4,15 +4,18 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { TokenGenerator } from '../../../TokenGenerator'
 import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
-
-const BEARER_LENGTH = 'Bearer '.length
+import { parseJWTToken } from './AuthenticationHeaderParser'
 
 export interface UserToken {
     roles: string[]
 }
 
 export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticator {
-    constructor(private publicKeyBase64: string, private algorithm: string) {}
+    constructor(
+        private publicKeyBase64: string,
+        private algorithm: string,
+        private cookie?: string,
+    ) {}
 
     getRoles(request: Request<ParamsDictionary>) {
         return (request && (request as JWTRequest<U>).user?.roles) || []
@@ -24,22 +27,15 @@ export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticat
 
     getMiddleware(): RequestHandler<ParamsDictionary> {
         return async (request, __, next) => {
-            const authorizationHeader = request.headers?.authorization
             Logger.debug('Process authorization header in JWTAuthenticator')
+            const jwt = parseJWTToken(request, this.cookie)
 
-            if (authorizationHeader) {
-                const jwt = authorizationHeader.substring(
-                    BEARER_LENGTH,
-                    authorizationHeader.length,
-                )
-
+            if (jwt) {
                 try {
-                    request.user =
-                        jwt &&
-                        (await TokenGenerator.verifyJWT<U>(jwt, {
-                            publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
-                            algorithms: [this.algorithm],
-                        }))
+                    request.user = await TokenGenerator.verifyJWT<U>(jwt, {
+                        publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
+                        algorithms: [this.algorithm],
+                    })
                 } catch (error) {
                     Logger.warn('Failed to verify JWT', error)
                 }
