@@ -104,7 +104,7 @@
     "type-graphql": "^0.17.5",
     "typescript": "^3.7.2",
     "typescript-ioc": "^3.2.1",
-    "typescript-rest": "^3.0.2",
+    "typescript-rest": "^3.0.1",
     "typescript-rest-ioc": "^1.0.0"
   },
   "devDependencies": {

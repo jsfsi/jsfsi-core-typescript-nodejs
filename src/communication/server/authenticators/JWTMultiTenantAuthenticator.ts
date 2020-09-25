@@ -5,7 +5,6 @@ import { TokenGenerator } from '../../../TokenGenerator'
 import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
-import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
 
 export const TENANT_HEADER = 'X-Api-Tenant'
 export const ADMIN_ROLE = 'admin'
@@ -28,7 +27,6 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     ) {}
 
     getRoles(request: Request<ParamsDictionary>) {
-        Logger.debug('Process roles in JWTMultiTenantAuthenticator')
         const tenantId = request.get(TENANT_HEADER)
         const user = request && (request as JWTRequest<U>).user
         const headerTenant = user?.tenants?.[tenantId]
@@ -64,7 +62,6 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
                     })
                 } catch (error) {
                     Logger.warn('Failed to verify JWT', error)
-                    throw new ForbiddenError('Failed to verify JWT')
                 }
             }
 

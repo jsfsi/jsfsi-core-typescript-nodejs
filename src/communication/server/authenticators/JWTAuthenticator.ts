@@ -5,7 +5,6 @@ import { TokenGenerator } from '../../../TokenGenerator'
 import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
-import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
 
 export interface UserToken {
     roles: string[]
@@ -39,7 +38,6 @@ export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticat
                     })
                 } catch (error) {
                     Logger.warn('Failed to verify JWT', error)
-                    throw new ForbiddenError('Failed to verify JWT')
                 }
             }
 
