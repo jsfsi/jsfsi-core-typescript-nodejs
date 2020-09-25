@@ -6,6 +6,8 @@ import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
 import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
+import { errorHandler } from '../ErrorHandler'
+import { HttpError } from 'typescript-rest/dist/server/model/errors'
 
 export interface UserToken {
     roles: string[]
@@ -28,8 +30,9 @@ export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticat
     }
 
     getMiddleware(): RequestHandler<ParamsDictionary> {
-        return async (request, __, next) => {
+        return async (request, response, next) => {
             Logger.debug('Process authorization header in JWTAuthenticator')
+            let error: HttpError
             const jwt = parseJWTToken(request, this.cookie)
 
             try {
@@ -37,12 +40,16 @@ export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticat
                     publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
                     algorithms: [this.algorithm],
                 })
-            } catch (error) {
-                Logger.warn('Failed to verify JWT', error)
-                throw new ForbiddenError('Failed to verify JWT')
+            } catch (validationError) {
+                Logger.warn('Failed to verify JWT', validationError)
+                error = new ForbiddenError('Failed to verify JWT') as HttpError
             }
 
-            next()
+            if (error) {
+                errorHandler(error, request, response, next)
+            } else {
+                next()
+            }
         }
     }
 }

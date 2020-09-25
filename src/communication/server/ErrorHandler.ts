@@ -40,7 +40,7 @@ export const errorHandler = (
                 StatusCode.AUTHENTICATION_TIMEOUT) ||
             StatusCode.INTERNAL_SERVER_ERROR
 
-        const location = (error as UnauthorizedError).location
+        const location = (error as UnauthorizedError)?.location
 
         Logger.debug('Default error handler:', statusCode, error.name, error.message)
 

@@ -6,6 +6,8 @@ import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
 import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
+import { HttpError } from 'typescript-rest/dist/server/model/errors'
+import { errorHandler } from '..'
 
 export const TENANT_HEADER = 'X-Api-Tenant'
 export const ADMIN_ROLE = 'admin'
@@ -52,8 +54,9 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     }
 
     getMiddleware(): RequestHandler<ParamsDictionary> {
-        return async (request, __, next) => {
+        return async (request, response, next) => {
             Logger.debug('Process authorization header in JWTMultiTenantAuthenticator')
+            let error: HttpError
             const jwt = parseJWTToken(request, this.cookie)
 
             try {
@@ -61,12 +64,16 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
                     publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
                     algorithms: [this.algorithm],
                 })
-            } catch (error) {
-                Logger.warn('Failed to verify JWT', error)
-                throw new ForbiddenError('Failed to verify JWT')
+            } catch (validationError) {
+                Logger.warn('Failed to verify JWT', validationError)
+                error = new ForbiddenError('Failed to verify JWT') as HttpError
             }
 
-            next()
+            if (error) {
+                errorHandler(error, request, response, next)
+            } else {
+                next()
+            }
         }
     }
 }
