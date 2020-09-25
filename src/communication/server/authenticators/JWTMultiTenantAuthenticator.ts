@@ -54,17 +54,19 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     getMiddleware(): RequestHandler<ParamsDictionary> {
         return async (request, __, next) => {
             Logger.debug('Process authorization header in JWTMultiTenantAuthenticator')
-            const jwt = parseJWTToken(request, this.cookie)
+            if (!request.user) {
+                const jwt = parseJWTToken(request, this.cookie)
 
-            if (jwt) {
-                try {
-                    request.user = await TokenGenerator.verifyJWT<U>(jwt, {
-                        publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
-                        algorithms: [this.algorithm],
-                    })
-                } catch (error) {
-                    Logger.warn('Failed to verify JWT', error)
-                    throw new ForbiddenError('Failed to verify JWT')
+                if (jwt) {
+                    try {
+                        request.user = await TokenGenerator.verifyJWT<U>(jwt, {
+                            publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
+                            algorithms: [this.algorithm],
+                        })
+                    } catch (error) {
+                        Logger.warn('Failed to verify JWT', error)
+                        throw new ForbiddenError('Failed to verify JWT')
+                    }
                 }
             }
 
