@@ -5,6 +5,7 @@ import { TokenGenerator } from '../../../TokenGenerator'
 import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
+import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
 
 export const TENANT_HEADER = 'X-Api-Tenant'
 export const ADMIN_ROLE = 'admin'
@@ -27,6 +28,7 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     ) {}
 
     getRoles(request: Request<ParamsDictionary>) {
+        Logger.debug('Process roles in JWTMultiTenantAuthenticator')
         const tenantId = request.get(TENANT_HEADER)
         const user = request && (request as JWTRequest<U>).user
         const headerTenant = user?.tenants?.[tenantId]
@@ -52,16 +54,19 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
     getMiddleware(): RequestHandler<ParamsDictionary> {
         return async (request, __, next) => {
             Logger.debug('Process authorization header in JWTMultiTenantAuthenticator')
-            const jwt = parseJWTToken(request, this.cookie)
+            if (!request.user) {
+                const jwt = parseJWTToken(request, this.cookie)
 
-            if (jwt) {
-                try {
-                    request.user = await TokenGenerator.verifyJWT<U>(jwt, {
-                        publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
-                        algorithms: [this.algorithm],
-                    })
-                } catch (error) {
-                    Logger.warn('Failed to verify JWT', error)
+                if (jwt) {
+                    try {
+                        request.user = await TokenGenerator.verifyJWT<U>(jwt, {
+                            publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
+                            algorithms: [this.algorithm],
+                        })
+                    } catch (error) {
+                        Logger.warn('Failed to verify JWT', error)
+                        throw new ForbiddenError('Failed to verify JWT')
+                    }
                 }
             }
 

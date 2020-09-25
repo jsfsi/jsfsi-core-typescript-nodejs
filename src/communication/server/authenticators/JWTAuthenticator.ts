@@ -5,6 +5,7 @@ import { TokenGenerator } from '../../../TokenGenerator'
 import { Logger } from '../../../Logger'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
+import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
 
 export interface UserToken {
     roles: string[]
@@ -18,6 +19,7 @@ export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticat
     ) {}
 
     getRoles(request: Request<ParamsDictionary>) {
+        Logger.debug('Process roles in JWTAuthenticator')
         return (request && (request as JWTRequest<U>).user?.roles) || []
     }
 
@@ -28,16 +30,19 @@ export class JWTAuthenticator<U extends UserToken> implements ServiceAuthenticat
     getMiddleware(): RequestHandler<ParamsDictionary> {
         return async (request, __, next) => {
             Logger.debug('Process authorization header in JWTAuthenticator')
-            const jwt = parseJWTToken(request, this.cookie)
+            if (!request.user) {
+                const jwt = parseJWTToken(request, this.cookie)
 
-            if (jwt) {
-                try {
-                    request.user = await TokenGenerator.verifyJWT<U>(jwt, {
-                        publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
-                        algorithms: [this.algorithm],
-                    })
-                } catch (error) {
-                    Logger.warn('Failed to verify JWT', error)
+                if (jwt) {
+                    try {
+                        request.user = await TokenGenerator.verifyJWT<U>(jwt, {
+                            publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
+                            algorithms: [this.algorithm],
+                        })
+                    } catch (error) {
+                        Logger.warn('Failed to verify JWT', error)
+                        throw new ForbiddenError('Failed to verify JWT')
+                    }
                 }
             }
 
