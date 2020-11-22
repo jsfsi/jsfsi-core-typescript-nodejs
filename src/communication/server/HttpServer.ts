@@ -282,7 +282,7 @@ export class HttpServer {
         )
     }
 
-    public async start(): Promise<void> {
+    public async setup(): Promise<void> {
         this.setupCookieParser()
         this.setupCors()
         this.setupJsonParse()
@@ -297,7 +297,10 @@ export class HttpServer {
         this.setupCustomMiddlewares(CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS)
 
         this._application.set('trust proxy', true)
+    }
 
+    public async start(): Promise<void> {
+        await this.setup()
         return new Promise<void>(resolve => {
             this._application.listen(this.builder.port, () => {
                 Logger.info(`Server listening on port ${this.builder.port}`)
