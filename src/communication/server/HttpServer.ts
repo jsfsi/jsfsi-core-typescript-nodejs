@@ -11,6 +11,7 @@ import { setupGraphQL, GraphqlOptions } from './GraphQL'
 import { HateoasRules, setupHateoasRules } from './Hateoas'
 import { StatusCode } from '@jsfsi-core/typescript-cross-platform'
 import { MemoryStorage, Storage } from '../..'
+import { Server as ExpressServer } from 'http'
 
 const DEFAULT_PORT = 8080
 
@@ -170,6 +171,7 @@ export class HttpServerBuilder {
 
 export class HttpServer {
     private _application: Application
+    private _server: ExpressServer
     private builder: HttpServerBuilder
     private etagStorage: Storage<string, string> = new MemoryStorage()
 
@@ -180,6 +182,10 @@ export class HttpServer {
 
     public get application() {
         return this._application
+    }
+
+    public get server(): ExpressServer {
+        return this._server
     }
 
     private setupCors() {
@@ -302,7 +308,7 @@ export class HttpServer {
     public async start(): Promise<void> {
         await this.setup()
         return new Promise<void>(resolve => {
-            this._application.listen(this.builder.port, () => {
+            this._server = this._application.listen(this.builder.port, () => {
                 Logger.info(`Server listening on port ${this.builder.port}`)
                 resolve()
             })
