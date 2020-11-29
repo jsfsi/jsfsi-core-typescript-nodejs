@@ -1,12 +1,12 @@
 import { HttpRequest, HttpMethods } from '@jsfsi-core/typescript-cross-platform'
 
 export interface GoogleUser {
-    azp: string
-    aud: string
-    sub: string
-    email: string
-    name: string
-    picture: string
+    azp?: string
+    aud?: string
+    sub?: string
+    email?: string
+    name?: string
+    picture?: string
 }
 
 export class Google {
