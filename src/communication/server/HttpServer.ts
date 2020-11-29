@@ -141,7 +141,7 @@ export class HttpServerBuilder {
         return this
     }
 
-    public withHateoasRules(rules: HateoasRules) {
+    public withHateoasRules(rules: HateoasRules = {}) {
         this._hateoasRules = rules
         return this
     }
@@ -222,7 +222,7 @@ export class HttpServer {
     }
 
     private setupHateoasRules() {
-        if (this.builder.hateoasRules && Object.keys(this.builder.hateoasRules).length) {
+        if (this.builder.hateoasRules) {
             setupHateoasRules(this._application, this.builder.hateoasRules)
         }
     }
