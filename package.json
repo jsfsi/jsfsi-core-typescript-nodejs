@@ -86,7 +86,7 @@
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "apollo-server": "^2.14.2",
-    "apollo-server-express": "^2.9.12",
+    "apollo-server-express": "^2.14.2",
     "cors": "^2.8.5",
     "eslint": "^6.7.1",
     "eslint-config-prettier": "^6.7.0",
