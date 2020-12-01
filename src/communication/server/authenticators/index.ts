@@ -1,4 +1,4 @@
 export * from './JWTAuthenticator'
-export * from './JWTMultiTenantAuthenticator'
+export * from './JWTTenantAuthenticator'
 export * from './JWTRequest'
 export * from './AuthenticationHeaderParser'

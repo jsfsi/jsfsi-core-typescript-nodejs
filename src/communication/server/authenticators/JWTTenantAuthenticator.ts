@@ -17,11 +17,11 @@ export interface TenantToken {
     roles: string[]
 }
 
-export interface UserTenantsToken {
-    tenants: { [key: string]: TenantToken }
+export interface UserTenantToken {
+    tenant: TenantToken
 }
 
-export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
+export class JWTTenantAuthenticator<U extends UserTenantToken>
     implements ServiceAuthenticator {
     constructor(
         private publicKeyBase64: string,
@@ -29,21 +29,20 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
         private cookie?: string,
     ) {}
 
+    private publicKey: Buffer
+
     getRoles(request: Request<ParamsDictionary>) {
-        Logger.debug('Process roles in JWTMultiTenantAuthenticator')
-        const tenantId = request.get(TENANT_HEADER)
+        Logger.debug('Process roles in JWTTenantAuthenticator')
         const user = request && (request as JWTRequest<U>).user
-        const headerTenant = user?.tenants?.[tenantId]
 
         let roles: string[] = []
 
-        if (headerTenant) {
-            roles = headerTenant.roles
-            headerTenant.isAdmin && roles.push(ADMIN_ROLE)
-        } else if (Object.keys(user?.tenants || {}).length === 1) {
-            const singleTenant = Object.values(user?.tenants)[0]
-            roles = singleTenant.roles
-            singleTenant.isAdmin && roles.push(ADMIN_ROLE)
+        if (user?.tenant?.roles) {
+            roles = roles.concat(user.tenant.roles)
+        }
+
+        if (user?.tenant?.isAdmin) {
+            roles.push(ADMIN_ROLE)
         }
 
         return roles
@@ -55,13 +54,17 @@ export class JWTMultiTenantAuthenticator<U extends UserTenantsToken>
 
     getMiddleware(): RequestHandler<ParamsDictionary> {
         return async (request, response, next) => {
-            Logger.debug('Process authorization header in JWTMultiTenantAuthenticator')
+            Logger.debug('Process authorization header in JWTTenantAuthenticator')
             let error: HttpError
             const jwt = parseJWTToken(request, this.cookie)
 
+            if (!this.publicKey) {
+                this.publicKey = Buffer.from(this.publicKeyBase64, 'base64')
+            }
+
             try {
                 request.user = await TokenGenerator.verifyJWT<U>(jwt, {
-                    publicKey: Buffer.from(this.publicKeyBase64, 'base64'),
+                    publicKey: this.publicKey,
                     algorithms: [this.algorithm],
                 })
             } catch (validationError) {
