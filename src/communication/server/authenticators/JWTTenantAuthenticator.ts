@@ -13,11 +13,11 @@ export const TENANT_HEADER = 'X-Api-Tenant'
 export const ADMIN_ROLE = 'admin'
 
 export interface TenantToken {
-    isAdmin: boolean
     roles: string[]
 }
 
 export interface UserTenantToken {
+    isAdmin: boolean
     tenant: TenantToken
 }
 
@@ -41,7 +41,7 @@ export class JWTTenantAuthenticator<U extends UserTenantToken>
             roles = roles.concat(user.tenant.roles)
         }
 
-        if (user?.tenant?.isAdmin) {
+        if (user?.isAdmin) {
             roles.push(ADMIN_ROLE)
         }
 
