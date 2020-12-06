@@ -1,4 +1,4 @@
-import uuid from 'uuid'
+import uuid = require('uuid')
 
 export class Guid {
     private _uuid: string
@@ -20,6 +20,6 @@ export class Guid {
     }
 
     public static Empty() {
-        return new Guid('00000000-0000-0000-0000-000000000000')
+        return new Guid(uuid.NIL)
     }
 }
