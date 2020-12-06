@@ -83,6 +83,7 @@
     "@types/redis": "^2.8.14",
     "@types/redis-mock": "^0.17.0",
     "@types/swagger-ui-express": "^3.0.1",
+    "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "apollo-server": "^2.9.12",
@@ -105,7 +106,8 @@
     "typescript": "^3.7.2",
     "typescript-ioc": "^3.2.1",
     "typescript-rest": "3.0.1",
-    "typescript-rest-ioc": "^1.0.0"
+    "typescript-rest-ioc": "^1.0.0",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@types/jest": "^24.9.0",
