@@ -20,6 +20,6 @@ export class Guid {
     }
 
     public static Empty() {
-        return new Guid(uuid.NIL)
+        return new Guid('00000000-0000-0000-0000-000000000000')
     }
 }
