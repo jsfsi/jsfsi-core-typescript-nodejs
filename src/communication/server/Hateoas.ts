@@ -49,11 +49,17 @@ export class HateoasParser {
                 if (key === '_links') {
                     this.parseBodyLinks(parsedBody._links, request, response)
                 } else {
-                    if (Array.isArray(parsedBody[key])) {
+                    if (
+                        Array.isArray(parsedBody[key]) &&
+                        typeof parsedBody[key]?.[0] === 'object'
+                    ) {
                         parsedBody[key] = (parsedBody[key] as Array<unknown>).map(item =>
                             this.parseLinks(item, request, response),
                         )
-                    } else if (typeof parsedBody[key] === 'object') {
+                    } else if (
+                        typeof parsedBody[key] === 'object' &&
+                        !Array.isArray(parsedBody[key])
+                    ) {
                         parsedBody[key] = this.parseLinks(
                             parsedBody[key],
                             request,
