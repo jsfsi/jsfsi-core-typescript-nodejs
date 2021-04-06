@@ -3,7 +3,8 @@ import uuid = require('uuid')
 export class Guid {
     private _uuid: string
 
-    private constructor(value: string) {
+    public constructor(value: string) {
+        uuid.parse(value)
         this._uuid = value
     }
 
@@ -21,5 +22,9 @@ export class Guid {
 
     public static Empty() {
         return new Guid(uuid.NIL)
+    }
+
+    public static IsValid(value: string) {
+        return uuid.validate(value)
     }
 }
