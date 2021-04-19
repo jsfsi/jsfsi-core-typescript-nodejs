@@ -1,6 +1,7 @@
 // Note: I prefer using a JavaScript file for the .eslintrc file (instead of a JSON file)
 // as it supports comments that can be used to better describe rules.
 module.exports = {
+  ignorePatterns: ["*.d.ts"],
   parser: '@typescript-eslint/parser',  // Specifies the ESLint parser
   extends: [
     'plugin:@typescript-eslint/recommended',  // Uses the recommended rules from the @typescript-eslint/eslint-plugin
