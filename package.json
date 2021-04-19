@@ -116,8 +116,8 @@
         "uuid": "^8.3.1"
     },
     "devDependencies": {
-        "@types/jest": "^24.9.0",
-        "jest": "^24.9.0",
-        "ts-jest": "^24.3.0"
+        "@types/jest": "^26.0.22",
+        "jest": "^26.6.3",
+        "ts-jest": "^26.5.5"
     }
 }
