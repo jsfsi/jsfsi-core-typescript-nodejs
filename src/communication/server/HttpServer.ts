@@ -10,7 +10,6 @@ import { Logger } from '../../Logger'
 import { MemoryStorage, Storage } from '../..'
 import { errorHandler as defaultErrorHandler, ErrorHandler } from './ErrorHandler'
 import { SwaggerOptions, buildSwaggerOptions, setupSwagger } from './Swagger'
-import { setupGraphQL, GraphqlOptions } from './GraphQL'
 import { HateoasRules, setupHateoasRules } from './Hateoas'
 
 const DEFAULT_PORT = 8080
@@ -43,7 +42,6 @@ export class HttpServerBuilder {
   private _errorHandler: ErrorHandler
   private _jsonOptions: OptionsJson
   private _cookieParserOptions: CookieParserOptions
-  private _graphqlOptions: GraphqlOptions
   private _hateoasRules: HateoasRules
   private _authenticator: ServiceAuthenticator
   private _cacheEtag: boolean
@@ -78,10 +76,6 @@ export class HttpServerBuilder {
 
   public get cookieParserOptions() {
     return this._cookieParserOptions
-  }
-
-  public get graphqlOptions() {
-    return this._graphqlOptions
   }
 
   public get hateoasRules(): HateoasRules {
@@ -133,11 +127,6 @@ export class HttpServerBuilder {
 
   public withCookieParser(options: CookieParserOptions) {
     this._cookieParserOptions = options
-    return this
-  }
-
-  public withGraphql(options: GraphqlOptions) {
-    this._graphqlOptions = options
     return this
   }
 
@@ -198,7 +187,7 @@ export class HttpServer {
         origin: (this.builder.corsDomains || '')
           .split(',')
           // eslint-disable-next-line security-node/non-literal-reg-expr
-          .map(regExp => new RegExp(regExp)),
+          .map((regExp) => new RegExp(regExp)),
         maxAge: 5,
         exposedHeaders: ['X-Api-Version', 'X-Request-Id', 'X-Response-Time'],
         credentials: true,
@@ -240,12 +229,6 @@ export class HttpServer {
     }
   }
 
-  private async setupGraphql() {
-    if (this.builder.graphqlOptions) {
-      await setupGraphQL(this._application, this.builder.graphqlOptions)
-    }
-  }
-
   private setupAuthenticator() {
     if (this.builder.authenticator) {
       Server.registerAuthenticator(this.builder.authenticator)
@@ -284,7 +267,7 @@ export class HttpServer {
   }
 
   private setupCustomMiddlewares(order: CUSTOM_MIDDLEWARE_ORDER) {
-    this.builder.customMiddlewares[order].forEach(middleware =>
+    this.builder.customMiddlewares[order].forEach((middleware) =>
       this._application.use(middleware),
     )
   }
@@ -300,7 +283,6 @@ export class HttpServer {
     this.setupHateoasRules()
     this.setupControllers()
     this.setupErrorHandler()
-    await this.setupGraphql()
     this.setupCustomMiddlewares(CUSTOM_MIDDLEWARE_ORDER.AFTER_CONTROLLERS)
 
     this._application.set('trust proxy', true)
@@ -308,7 +290,7 @@ export class HttpServer {
 
   public async start(): Promise<void> {
     await this.setup()
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       this._server = this._application.listen(this.builder.port, () => {
         Logger.info(`Server listening on port ${this.builder.port}`)
         resolve()

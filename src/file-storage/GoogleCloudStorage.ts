@@ -25,10 +25,7 @@ export class GoogleCloudStorage extends FileStorage<GoogleCloudStorageConfigurat
 
   public async getFile(filename: string): Promise<URL> {
     try {
-      await this.storage
-        .bucket(this.configuration.bucket)
-        .file(filename)
-        .getMetadata()
+      await this.storage.bucket(this.configuration.bucket).file(filename).getMetadata()
       const [url] = await this.storage
         .bucket(this.configuration.bucket)
         .file(filename)
@@ -55,7 +52,7 @@ export class GoogleCloudStorage extends FileStorage<GoogleCloudStorageConfigurat
       fs.mkdirSync(dir)
     }
 
-    fs.writeFile(filename, file, 'binary', error => {
+    fs.writeFile(filename, file, 'binary', (error) => {
       error && Logger.warn('GoogleCloudStorage', 'Failed to write temporary file', error)
     })
 
@@ -68,7 +65,7 @@ export class GoogleCloudStorage extends FileStorage<GoogleCloudStorageConfigurat
       .file(filePath)
       .getMetadata()
 
-    fs.unlink(filename, error => {
+    fs.unlink(filename, (error) => {
       error && Logger.warn('GoogleCloudStorage', 'Failed to delete temporary file', error)
     })
 

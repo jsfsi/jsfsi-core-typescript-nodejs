@@ -19,7 +19,7 @@ export class TokenGenerator {
     return new Promise<string>((resolve, reject) => {
       try {
         const signOptions: SignOptions = {
-          algorithm: (options.algorithm as unknown) as Algorithm,
+          algorithm: options.algorithm as unknown as Algorithm,
         }
         sign(
           { ...payload, exp: options.expirationDate },
@@ -35,14 +35,14 @@ export class TokenGenerator {
     })
   }
 
-  public static verifyJWT = <P extends object>(
+  public static verifyJWT = <P extends Record<string, unknown>>(
     token: string,
     options: JWTDecodingOptions,
   ): Promise<P> => {
     return new Promise<P>((resolve, reject) => {
       try {
         const decodingOptions = {
-          algorithms: (options.algorithms as unknown) as Algorithm[],
+          algorithms: options.algorithms as unknown as Algorithm[],
         }
 
         verify(token, options.publicKey, decodingOptions, (error, decoded) => {

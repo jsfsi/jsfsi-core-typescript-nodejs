@@ -9,8 +9,8 @@ export type DiskStorageConfiguration = {
 
 export class DiskStorage extends FileStorage<DiskStorageConfiguration> {
   public async getFile(filePath: string): Promise<string> {
-    return new Promise<string>(resolve => {
-      fs.access(filePath, error => {
+    return new Promise<string>((resolve) => {
+      fs.access(filePath, (error) => {
         error ? resolve(this.configuration.notFoundPath) : resolve(filePath)
       })
     })
@@ -23,7 +23,7 @@ export class DiskStorage extends FileStorage<DiskStorageConfiguration> {
         fs.mkdirSync(dir)
       }
 
-      fs.writeFile(filePath, file, 'binary', async error => {
+      fs.writeFile(filePath, file, 'binary', async (error) => {
         error ? reject(error) : resolve(filePath)
       })
     })

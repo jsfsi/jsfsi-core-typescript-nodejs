@@ -1,7 +1,6 @@
 export * from './HttpServer'
 export * from './ServerPage'
 export * from './ErrorHandler'
-export * from './GraphQL'
 export * from './Swagger'
 export * from './Hateoas'
 export * from './authenticators'

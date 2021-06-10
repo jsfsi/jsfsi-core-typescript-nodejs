@@ -1,123 +1,118 @@
 {
-    "name": "@jsfsi-core/typescript-nodejs",
-    "version": "0.0.0",
-    "description": "Typescript libraries for nodejs to support jsfsi developments",
-    "keywords": [
-        "core",
-        "jsfsi",
-        "nodejs"
+  "name": "@jsfsi-core/typescript-nodejs",
+  "version": "0.0.0",
+  "description": "Typescript libraries for nodejs to support jsfsi developments",
+  "keywords": [
+    "core",
+    "jsfsi",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs#readme",
+  "bugs": {
+    "url": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs.git"
+  },
+  "license": "ISC",
+  "author": "JSFSI <joao.franco@jsfsi.com>",
+  "main": "./dist",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean:build && npm run lint && tsc",
+    "clean": "npm run clean:build; rm -rf node_modules",
+    "clean:build": "rm -rf dist",
+    "postinstall": "npm run clean:build && tsc",
+    "lint": "eslint . --quiet --fix --ext .ts,.tsx",
+    "setup": "npm run clean && npm install",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:integration": "jest --rootDir tests/integration",
+    "test:unit": ". tests/configuration/test.local.env && jest --rootDir tests/unit",
+    "test:unit:debug": ". tests/configuration/test.local.env && nodemon --watch dist --inspect-brk=0.0.0.0:3002 --nolazy node_modules/.bin/jest --rootDir tests/unit",
+    "test:unit:watch": ". tests/configuration/test.local.env && jest --rootDir tests/unit --watchAll",
+    "watch": "npm run clean:build && tsc -w"
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "src/**/*.{ts,js}",
+      "!src/**/*.d.ts"
     ],
-    "homepage": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs#readme",
-    "bugs": {
-        "url": "https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs/issues"
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "index.ts"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "globals": {
+      "ts-jest": {
+        "babelConfig": false,
+        "tsConfig": "tsconfig.json"
+      }
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/joaosousafranco/jsfsi-core-typescript-nodejs.git"
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "json"
+    ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^tests/(.*)$": "<rootDir>/tests/$1"
     },
-    "license": "ISC",
-    "author": "JSFSI <joao.franco@jsfsi.com>",
-    "main": "./dist",
-    "typings": "./dist/index.d.ts",
-    "scripts": {
-        "build": "npm run clean:build && npm run lint && tsc",
-        "clean": "npm run clean:build; rm -rf node_modules",
-        "clean:build": "rm -rf dist",
-        "postinstall": "npm run clean:build && tsc",
-        "lint": "eslint . --quiet --fix --ext .ts,.tsx",
-        "setup": "npm run clean && npm install",
-        "test": "npm run test:unit && npm run test:integration",
-        "test:integration": "jest --rootDir tests/integration",
-        "test:unit": ". tests/configuration/test.local.env && jest --rootDir tests/unit",
-        "test:unit:debug": ". tests/configuration/test.local.env && nodemon --watch dist --inspect-brk=0.0.0.0:3002 --nolazy node_modules/.bin/jest --rootDir tests/unit",
-        "test:unit:watch": ". tests/configuration/test.local.env && jest --rootDir tests/unit --watchAll",
-        "watch": "npm run clean:build && tsc -w"
-    },
-    "jest": {
-        "clearMocks": true,
-        "collectCoverage": false,
-        "collectCoverageFrom": [
-            "src/**/*.{ts,js}",
-            "!src/**/*.d.ts"
-        ],
-        "coveragePathIgnorePatterns": [
-            "/node_modules/",
-            "index.ts"
-        ],
-        "coverageReporters": [
-            "json",
-            "lcov",
-            "text",
-            "text-summary"
-        ],
-        "globals": {
-            "ts-jest": {
-                "babelConfig": false,
-                "tsConfig": "tsconfig.json"
-            }
-        },
-        "moduleFileExtensions": [
-            "js",
-            "ts",
-            "json"
-        ],
-        "moduleNameMapper": {
-            "^src/(.*)$": "<rootDir>/src/$1",
-            "^tests/(.*)$": "<rootDir>/tests/$1"
-        },
-        "preset": "ts-jest",
-        "testEnvironment": "node",
-        "testMatch": [
-            "**/*.(test|spec).(ts)"
-        ],
-        "transform": {
-            "^.+\\.ts?$": "ts-jest"
-        }
-    },
-    "dependencies": {
-        "@google-cloud/storage": "^5.8.1",
-        "@jsfsi-core/typescript-cross-platform": "git+https://github.com/joaosousafranco/jsfsi-core-typescript-cross-platform.git",
-        "@types/cors": "^2.8.6",
-        "@types/express": "^4.17.2",
-        "@types/express-mung": "^0.5.2",
-        "@types/graphql": "^14.5.0",
-        "@types/jsonwebtoken": "^8.3.5",
-        "@types/node-fetch": "^2.5.4",
-        "@types/redis": "^2.8.14",
-        "@types/redis-mock": "^0.17.0",
-        "@types/swagger-ui-express": "^3.0.1",
-        "@types/uuid": "^8.3.0",
-        "@typescript-eslint/eslint-plugin": "^2.9.0",
-        "@typescript-eslint/parser": "^2.9.0",
-        "apollo-server": "^2.9.12",
-        "apollo-server-express": "^2.9.12",
-        "cors": "^2.8.5",
-        "eslint": "^6.7.1",
-        "eslint-config-prettier": "^6.7.0",
-        "eslint-plugin-import": "^2.22.0",
-        "eslint-plugin-prettier": "^3.1.1",
-        "eslint-plugin-security-node": "^1.0.14",
-        "eslint-plugin-unused-imports": "^0.1.3",
-        "express-mung": "^0.5.1",
-        "graphql": "^14.5.8",
-        "jsonwebtoken": "^8.5.1",
-        "knex": "^0.19.5",
-        "log4js": "^5.2.2",
-        "prettier": "^1.19.1",
-        "redis": "^2.8.0",
-        "redis-mock": "^0.47.0",
-        "reflect-metadata": "^0.1.13",
-        "swagger-ui-express": "^4.1.2",
-        "type-graphql": "^0.17.5",
-        "typescript": "^3.7.2",
-        "typescript-ioc": "^3.2.1",
-        "typescript-rest": "3.0.1",
-        "typescript-rest-ioc": "^1.0.0",
-        "uuid": "^8.3.1"
-    },
-    "devDependencies": {
-        "@types/jest": "^26.0.22",
-        "jest": "^26.6.3",
-        "ts-jest": "^26.5.5"
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/*.(test|spec).(ts)"
+    ],
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
     }
+  },
+  "dependencies": {
+    "@google-cloud/storage": "5.8.5",
+    "@jsfsi-core/typescript-cross-platform": "git+https://github.com/joaosousafranco/jsfsi-core-typescript-cross-platform.git",
+    "@types/cors": "2.8.10",
+    "@types/express": "4.17.12",
+    "@types/express-mung": "0.5.2",
+    "@types/jsonwebtoken": "8.5.1",
+    "@types/node-fetch": "2.5.10",
+    "@types/redis": "2.8.29",
+    "@types/redis-mock": "0.17.0",
+    "@types/swagger-ui-express": "4.1.2",
+    "@types/uuid": "8.3.0",
+    "@typescript-eslint/eslint-plugin": "4.26.1",
+    "@typescript-eslint/parser": "4.26.1",
+    "cors": "2.8.5",
+    "eslint": "7.28.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.23.4",
+    "eslint-plugin-prettier": "3.4.0",
+    "eslint-plugin-security-node": "1.0.14",
+    "eslint-plugin-unused-imports": "1.1.1",
+    "express-mung": "0.5.1",
+    "jsonwebtoken": "8.5.1",
+    "knex": "0.95.6",
+    "log4js": "6.3.0",
+    "redis": "3.1.2",
+    "redis-mock": "0.56.3",
+    "reflect-metadata": "0.1.13",
+    "swagger-ui-express": "4.1.6",
+    "typescript": "4.3.2",
+    "typescript-ioc": "3.2.2",
+    "typescript-rest": "3.0.3",
+    "typescript-rest-ioc": "1.0.0",
+    "uuid": "8.3.2"
+  },
+  "devDependencies": {
+    "@types/jest": "26.0.23",
+    "jest": "27.0.4",
+    "ts-jest": "27.0.3",
+    "prettier": "2.3.1"
+  }
 }

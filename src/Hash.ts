@@ -1,13 +1,12 @@
 import crypto from 'crypto'
 
-export function md5(data: string): string
-export function md5(data: object): string
+type data = Record<string, unknown>
 
-export function md5(data: string | object): string {
+export function md5(data: string): string
+export function md5(data: data): string
+
+export function md5(data: string | data): string {
   const textData = typeof data === 'object' ? JSON.stringify(data) : data
 
-  return crypto
-    .createHash('md5')
-    .update(textData)
-    .digest('hex')
+  return crypto.createHash('md5').update(textData).digest('hex')
 }

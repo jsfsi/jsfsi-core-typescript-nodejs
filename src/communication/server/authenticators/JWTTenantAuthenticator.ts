@@ -16,13 +16,14 @@ export interface TenantToken {
   roles: string[]
 }
 
-export interface UserTenantToken {
+export interface UserTenantToken extends Record<string, unknown> {
   isAdmin: boolean
   tenant: TenantToken
 }
 
 export class JWTTenantAuthenticator<U extends UserTenantToken>
-  implements ServiceAuthenticator {
+  implements ServiceAuthenticator
+{
   constructor(
     private publicKeyBase64: string,
     private algorithm: string,

@@ -45,7 +45,7 @@ export class HateoasParser {
     const parsedBody = Object.assign({}, body)
 
     if (parsedBody) {
-      Object.keys(parsedBody).forEach(key => {
+      Object.keys(parsedBody).forEach((key) => {
         if (key === '_links') {
           this.parseBodyLinks(parsedBody._links, request, response)
         } else {
@@ -53,7 +53,7 @@ export class HateoasParser {
             Array.isArray(parsedBody[key]) &&
             typeof parsedBody[key]?.[0] === 'object'
           ) {
-            parsedBody[key] = (parsedBody[key] as Array<unknown>).map(item =>
+            parsedBody[key] = (parsedBody[key] as Array<unknown>).map((item) =>
               this.parseLinks(item, request, response),
             )
           } else if (
@@ -71,7 +71,7 @@ export class HateoasParser {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private parseBodyLinks = (links: any, request?: Request, response?: Response) => {
-    Object.keys(links).forEach(key => {
+    Object.keys(links).forEach((key) => {
       const entity = links[key]
       links[key] = this.processEntity(entity, request, response)
     })

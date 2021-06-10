@@ -12,7 +12,7 @@ export class MemoryStorage implements Storage<string, string> {
     this.connection.set(key, value)
   }
   async get(key: string) {
-    return new Promise<string>(resolve => {
+    return new Promise<string>((resolve) => {
       this.connection.get(key, (_, value) => {
         resolve(value)
       })
@@ -33,7 +33,7 @@ export class MemoryStorage implements Storage<string, string> {
 
   dispose(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.connection.quit(error => {
+      this.connection.quit((error) => {
         error ? reject(error) : resolve()
       })
     })

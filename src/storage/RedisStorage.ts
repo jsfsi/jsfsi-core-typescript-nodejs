@@ -21,7 +21,7 @@ export class RedisStorage implements Storage<string, string> {
 
   async set(key: string, value: string) {
     return new Promise<void>((resolve, reject) => {
-      this.connection.set(key, value, error => {
+      this.connection.set(key, value, (error) => {
         error ? reject(error) : resolve()
       })
     })
@@ -37,7 +37,7 @@ export class RedisStorage implements Storage<string, string> {
 
   async expireIn(key: string, seconds: number) {
     return new Promise<void>((resolve, reject) => {
-      this.connection.expire(key, seconds, error => {
+      this.connection.expire(key, seconds, (error) => {
         error ? reject(error) : resolve()
       })
     })
@@ -45,7 +45,7 @@ export class RedisStorage implements Storage<string, string> {
 
   async delete(key: string) {
     return new Promise<void>((resolve, reject) => {
-      this.connection.del(key, error => {
+      this.connection.del(key, (error) => {
         error ? reject(error) : resolve()
       })
     })
@@ -53,7 +53,7 @@ export class RedisStorage implements Storage<string, string> {
 
   async clear() {
     return new Promise<void>((resolve, reject) => {
-      this.connection.flushdb(error => {
+      this.connection.flushdb((error) => {
         error ? reject(error) : resolve()
       })
     })
@@ -61,7 +61,7 @@ export class RedisStorage implements Storage<string, string> {
 
   async dispose() {
     return new Promise<void>((resolve, reject) => {
-      this.connection.quit(error => {
+      this.connection.quit((error) => {
         error ? reject(error) : resolve()
       })
     })

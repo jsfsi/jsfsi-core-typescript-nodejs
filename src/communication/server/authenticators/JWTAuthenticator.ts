@@ -9,7 +9,7 @@ import { errorHandler } from '../ErrorHandler'
 import { JWTRequest } from './JWTRequest'
 import { parseJWTToken } from './AuthenticationHeaderParser'
 
-export interface UserToken {
+export interface UserToken extends Record<string, unknown> {
   roles: string[]
 }
 

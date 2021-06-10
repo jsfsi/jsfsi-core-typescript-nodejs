@@ -13,7 +13,7 @@ export class Logger {
     },
   }
 
-  public static configure(param: object | string): void {
+  public static configure(param: Record<string, unknown> | string): void {
     if (this.logger) {
       Logger.warn('Logger already configured.')
     }
@@ -29,7 +29,9 @@ export class Logger {
         },
       })
     } else {
-      log4js.configure((param as log4js.Configuration) || this.defaultLoggerParameters)
+      log4js.configure(
+        (param as unknown as log4js.Configuration) || this.defaultLoggerParameters,
+      )
     }
 
     this.logger = log4js.getLogger()
