@@ -5,7 +5,7 @@ Typescript libraries for NodeJS for jsfsi developments
 ## Usage
 
 ```sh
-npm install @jsfsi-core/typescript-cross-platform
+npm install @jsfsi-core/typescript-nodejs
 ```
 
 ## Requirements
