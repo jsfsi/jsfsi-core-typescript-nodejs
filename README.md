@@ -2,11 +2,17 @@
 
 Typescript libraries for NodeJS for jsfsi developments
 
+## Usage
+
+```sh
+npm install @jsfsi-core/typescript-cross-platform
+```
+
 ## Requirements
 
 ### Visual Studio Code latest
 
-### NodeJS 12.11.1
+### NodeJS 16.3.0
 
 #### NodeJS Installation
 
@@ -15,7 +21,7 @@ Typescript libraries for NodeJS for jsfsi developments
 ```sh
 brew install node
 sudo npm install -g n
-sudo n 12.11.1
+sudo n 16.3.0
 ```
 
 ## Setup project
@@ -60,4 +66,13 @@ apt-get update
 apt-get install keychain openssl -y
 ssh-keygen -t rsa -b 4096 -f jwt.key && openssl rsa -in jwt.key -pubout -outform PEM -out jwt.key.pub
 cat jwt.key | base64 --wrap=0 && echo "" && echo "" && cat jwt.key.pub | base64 --wrap=0 && echo "" && echo "" && cat jwt.key.pub
+```
+
+## Publish to npm
+
+```sh
+npm login
+npm run build
+git tag <semantic version>
+npm publish --access public
 ```
