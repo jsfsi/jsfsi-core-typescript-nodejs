@@ -74,5 +74,6 @@ cat jwt.key | base64 --wrap=0 && echo "" && echo "" && cat jwt.key.pub | base64 
 npm login
 npm run build
 git tag <semantic version>
+git push origin <semantic version>
 npm publish --access public
 ```
