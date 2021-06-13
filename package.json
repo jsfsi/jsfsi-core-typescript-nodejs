@@ -1,6 +1,6 @@
 {
   "name": "@jsfsi-core/typescript-nodejs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typescript libraries for nodejs to support jsfsi developments",
   "keywords": [
     "core",
