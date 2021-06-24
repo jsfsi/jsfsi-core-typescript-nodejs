@@ -1,29 +1,35 @@
 // Note: I prefer using a JavaScript file for the .eslintrc file (instead of a JSON file)
 // as it supports comments that can be used to better describe rules.
 module.exports = {
-  ignorePatterns: ["*.d.ts"],
-  parser: '@typescript-eslint/parser',  // Specifies the ESLint parser
+  ignorePatterns: ['*.d.ts'],
+  parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   extends: [
-    'plugin:@typescript-eslint/recommended',  // Uses the recommended rules from the @typescript-eslint/eslint-plugin
-    'plugin:prettier/recommended',  // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
+    'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
     'plugin:security-node/recommended',
   ],
   parserOptions: {
-    ecmaVersion: 2018,  // Allows for the parsing of modern ECMAScript features
-    sourceType: 'module',  // Allows for the use of imports
+    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+    sourceType: 'module', // Allows for the use of imports
   },
   plugins: ['@typescript-eslint', 'import', 'unused-imports', 'security-node'],
   rules: {
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_*' }],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_*' }],
     'unused-imports/no-unused-imports-ts': 'error',
     'unused-imports/no-unused-vars-ts': [
-        'warn',
-        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      'warn',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
     ],
     'eol-last': ['error', 'always'],
     'import/default': 'error',
@@ -63,15 +69,8 @@ module.exports = {
     'import/order': [
       'error',
       {
-        'groups': [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index'
-        ],
-      }
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+      },
     ],
     'import/prefer-default-export': 'off',
     'import/unambiguous': 'off',
@@ -94,4 +93,4 @@ module.exports = {
     'security-node/detect-security-missconfiguration-cookie': 'error',
     'security-node/detect-sql-injection': 'error',
   },
-};
+}

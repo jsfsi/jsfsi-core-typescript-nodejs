@@ -1,7 +1,7 @@
 import { ServiceAuthenticator } from 'typescript-rest'
 import { Request, RequestHandler } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { ForbiddenError } from '@jsfsi-core/typescript-cross-platform'
+import { ForbiddenError, UserTenantToken } from '@jsfsi-core/typescript-cross-platform'
 import { HttpError } from 'typescript-rest/dist/server/model/errors'
 import { TokenGenerator } from '../../../TokenGenerator'
 import { Logger } from '../../../Logger'
@@ -11,15 +11,6 @@ import { parseJWTToken } from './AuthenticationHeaderParser'
 
 export const TENANT_HEADER = 'X-Api-Tenant'
 export const ADMIN_ROLE = 'admin'
-
-export interface TenantToken {
-  roles: string[]
-}
-
-export interface UserTenantToken extends Record<string, unknown> {
-  isAdmin: boolean
-  tenant: TenantToken
-}
 
 export class JWTTenantAuthenticator<U extends UserTenantToken>
   implements ServiceAuthenticator
