@@ -2,6 +2,7 @@ import {
   Link,
   HttpMethods,
   InternalServerError,
+  Page,
 } from '@jsfsi-core/typescript-cross-platform'
 import { HateoasRules, HateoasParser, Logger } from '../../src'
 
@@ -175,5 +176,50 @@ describe('Parse hateoas', () => {
         mockedHttpRequest,
       ),
     ).toThrow(InternalServerError)
+  })
+
+  it('Entity within a page with simple hateoas must be parsed', () => {
+    const hateoasEntity = hateoasParser.parseLinks(
+      new Page<unknown>({
+        pages: 1,
+        nextPage: 1,
+        totalElements: 1,
+        currentPage: 1,
+        pageSize: 1,
+        elements: [
+          {
+            test: 'test',
+            _links: {
+              test: new Link({
+                rel: 'TestEntity',
+                href: 'https://testdomain/test/124',
+                method: HttpMethods.GET,
+              }),
+            },
+          },
+        ],
+      }),
+      mockedHttpsRequest,
+    )
+
+    expect(hateoasEntity).toStrictEqual({
+      pages: 1,
+      nextPage: 1,
+      totalElements: 1,
+      currentPage: 1,
+      pageSize: 1,
+      elements: [
+        {
+          test: 'test',
+          _links: {
+            test: new Link({
+              rel: 'TestEntity',
+              href: 'https://testdomain/test/124',
+              method: HttpMethods.GET,
+            }),
+          },
+        },
+      ],
+    })
   })
 })
